@@ -62,6 +62,8 @@ export async function execute(interaction, client) {
   }
 
   try {
+    const queue = musicPlayer.getQueue(guild.id);
+    queue.channel = interaction.channel.id; // Update the queue channel
     // Update status message
     await interaction.editReply({
       embeds: [Embed.notify('Loading', 'Loading playlist...', TYPE.SEARCHING)]

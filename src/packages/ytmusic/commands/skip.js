@@ -91,6 +91,9 @@ export async function execute(interaction, client) {
   }
   
   try {
+    const queue = musicPlayer.getQueue(guild.id);
+    queue.channel = interaction.channel; // Set the channel to the interaction channel
+
     const skipped = musicPlayer.skipSongs(guild.id, skipCount);
     if (skipped) {
       const skipMessage = skipCount === 1 

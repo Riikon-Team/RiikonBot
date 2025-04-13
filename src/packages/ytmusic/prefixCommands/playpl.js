@@ -53,6 +53,9 @@ export async function execute(message, args, voiceChannel, musicPlayer) {
   
   try {
     // Send loading message
+    const queue = musicPlayer.getQueue(guild.id);
+    queue.channel = channel.id; // Update the queue channel
+
     const loadingMsg = await channel.send({
       embeds: [Embed.notify('Loading', `Loading playlist...`, TYPE.SEARCHING)]
     });
@@ -73,8 +76,8 @@ export async function execute(message, args, voiceChannel, musicPlayer) {
       });
     }
     
-    // Get songs from playlist (limited to 20)
-    const songs = await musicPlayer.getPlaylistSongs(playlistId, 20);
+    // Get songs from playlist (limited to 30)
+    const songs = await musicPlayer.getPlaylistSongs(playlistId, 30);
     
     if (!songs || songs.length === 0) {
       return loadingMsg.edit({
