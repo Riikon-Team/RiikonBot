@@ -281,7 +281,7 @@ export class YTDLPManager {
             '--no-simulate',
             '--no-progress',
             // Tối ưu kết nối mạng
-            '--concurrent-fragments', '3'
+            '--concurrent-fragments', '3',
         ];
 
         // Add cookies if they exist

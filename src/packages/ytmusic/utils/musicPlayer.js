@@ -303,6 +303,177 @@ export class MusicPlayer {
   }
 
   /**
+   * Skip multiple songs
+   * @param {string} guildId - Discord guild ID
+   * @param {number} count - Number of songs to skip (default: 1)
+   * @returns {boolean} Whether skip was successful
+   */
+  skipSongs(guildId, count = 1) {
+    const player = this.players.get(guildId);
+    const queue = this.getQueue(guildId);
+    
+    if (!player || !queue || queue.songs.length === 0) {
+      return false;
+    }
+    
+    // Ensure count is a valid number
+    count = Math.max(1, Math.min(count, queue.songs.length));
+    
+    // If skipping only the current song or skipping to the end
+    if (count === 1 || count >= queue.songs.length) {
+      player.stop(); // This will trigger the 'idle' event and play the next song
+      return true;
+    }
+    
+    // If skipping multiple songs, but not all
+    // Remove the songs that should be skipped (except the first one)
+    queue.songs.splice(1, count - 1);
+    
+    // Then stop the current song to trigger the next song playback
+    player.stop();
+    
+    return true;
+  }
+
+  /**
+   * Shuffle the songs in the queue
+   * @param {string} guildId - Discord guild ID
+   * @returns {number} Number of songs shuffled
+   */
+  shuffleQueue(guildId) {
+    const queue = this.getQueue(guildId);
+    
+    // Keep the currently playing song (index 0) and shuffle the rest
+    const currentSong = queue.songs.shift();
+    
+    // Fisher-Yates shuffle algorithm
+    for (let i = queue.songs.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [queue.songs[i], queue.songs[j]] = [queue.songs[j], queue.songs[i]];
+    }
+    
+    // Put the current song back at the beginning
+    queue.songs.unshift(currentSong);
+    
+    return queue.songs.length - 1; // Return number of songs shuffled (excluding current)
+  }
+
+  /**
+   * Extract playlist ID from YouTube URL
+   * @param {string} url - YouTube URL
+   * @returns {string|null} Playlist ID or null if not found
+   */
+  extractPlaylistId(url) {
+    if (!url) return null;
+
+    // Match playlist ID from URL
+    const match = url.match(/[&?]list=([^&]+)/i);
+    if (match && match[1]) {
+      return match[1];
+    }
+
+    return null;
+  }
+
+  /**
+   * Check if playlist is a YouTube Mix/Radio playlist
+   * @param {string} playlistId - YouTube playlist ID
+   * @returns {boolean} True if it's a Mix/Radio playlist
+   */
+  isRadioPlaylist(playlistId) {
+    return playlistId && playlistId.startsWith('RD');
+  }
+
+  /**
+   * Get songs from a YouTube playlist
+   * @param {string} playlistId - YouTube playlist ID
+   * @param {number} limit - Maximum number of songs to retrieve
+   * @returns {Promise<Array>} List of songs
+   */
+  async getPlaylistSongs(playlistId, limit = 20) {
+    try {
+      // Ensure we have a valid YouTube API instance
+      if (!this.youtubeAPI) {
+        logger.warn('YouTube API not initialized, trying to initialize now');
+        await this.initialize();
+
+        if (!this.youtubeAPI) {
+          throw new Error('YouTube API could not be initialized');
+        }
+      }
+
+      // Special handling for YouTube Mix/Radio playlists
+      if (this.isRadioPlaylist(playlistId)) {
+        // Extract the video ID from the playlist ID (for RD playlists)
+        // Example: RD-U2skn6u2RA -> -U2skn6u2RA
+        let videoId = playlistId.substring(2); // Remove 'RD' prefix
+        
+        // For RDMM prefixes, we need different handling
+        if (playlistId.startsWith('RDMM')) {
+          videoId = playlistId.substring(4); // Remove 'RDMM' prefix
+        }
+        
+        // If no valid video ID found, use the first match
+        if (!videoId || videoId.length < 11) {
+          // Try to extract from original playlist ID using regex
+          const videoMatch = playlistId.match(/[a-zA-Z0-9_-]{11}/);
+          videoId = videoMatch ? videoMatch[0] : null;
+          
+          if (!videoId) {
+            throw new Error('Could not extract video ID from radio playlist');
+          }
+        }
+        
+        // Get recommendations based on this video instead
+        logger.info(`Using recommendations for Mix playlist with video ID: ${videoId}`);
+        const recommendations = await this.youtubeAPI.getRecommendations(videoId);
+        
+        if (!recommendations || recommendations.length === 0) {
+          throw new Error('Could not retrieve recommendations for the Mix playlist');
+        }
+        
+        // Format recommendations to match song structure
+        const songs = recommendations
+          .slice(0, limit)
+          .map(video => ({
+            title: video.title || 'Unknown Title',
+            url: `https://www.youtube.com/watch?v=${video.id}`,
+            videoId: video.id,
+            duration: this.formatDuration(video.duration?.seconds || 0),
+            thumbnail: video.thumbnail?.[0]?.url || null,
+            author: video.author?.name || 'Unknown'
+          }));
+
+        return songs;
+      }
+
+      // Standard playlist handling
+      const playlist = await this.youtubeAPI.getPlaylist(playlistId);
+      
+      if (!playlist || !playlist.videos) {
+        throw new Error('Could not retrieve playlist or it has no videos');
+      }
+
+      // Get up to the limit number of songs
+      const songs = playlist.videos
+        .slice(0, limit)
+        .map(video => ({
+          title: video.title || 'Unknown Title',
+          url: `https://www.youtube.com/watch?v=${video.id}`,
+          videoId: video.id,
+          duration: this.formatDuration(video.duration?.seconds || 0),
+          thumbnail: video.thumbnail?.[0]?.url || null,
+          author: video.author?.name || 'Unknown'
+        }));
+
+      return songs;
+    } catch (error) {
+      logger.error('Error getting playlist songs:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Stop playback and clear the queue
    * @param {string} guildId - Discord guild ID
    */
