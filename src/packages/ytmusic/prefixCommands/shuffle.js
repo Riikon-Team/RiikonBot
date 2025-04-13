@@ -1,10 +1,10 @@
 import { TYPE, Embed } from '../utils/embed.js';
 
 export const config = {
-  name: 'skip',
-  aliases: ['s', 'next'],
-  description: 'Skip one or more songs in the queue',
-  usage: 'skip [number]',
+  name: 'shuffle',
+  aliases: ['mix', 'random'],
+  description: 'Shuffle songs in the current queue',
+  usage: 'shuffle',
   category: 'music'
 };
 
@@ -16,8 +16,8 @@ export async function execute(message, args, voiceChannel, musicPlayer) {
     return message.reply({
       embeds: [Embed.notify('Error', 'Music player is not available.', TYPE.ERROR)]
     });
-  }
-   
+  } 
+  
   // Check if bot is playing in this guild
   if (!musicPlayer.players.has(guild.id)) {
     return message.reply({
@@ -36,7 +36,7 @@ export async function execute(message, args, voiceChannel, musicPlayer) {
   // Check same voice channel
   if (botVoiceChannel && botVoiceChannel.id !== voiceChannel?.id) {
     return message.reply({
-      embeds: [Embed.notify('Error', 'You need to be in the same voice channel as me to skip songs!', TYPE.ERROR)]
+      embeds: [Embed.notify('Error', 'You need to be in the same voice channel as me to shuffle the queue!', TYPE.ERROR)]
     });
   }
   
@@ -51,47 +51,23 @@ export async function execute(message, args, voiceChannel, musicPlayer) {
     });
   }
   
-  // Check if there are songs in the queue
-  if (!queue || !queue.songs || queue.songs.length === 0) {
+  // Check if there are enough songs to shuffle
+  if (!queue || !queue.songs || queue.songs.length <= 2) {
     return message.reply({
-      embeds: [Embed.notify('Error', 'There are no songs to skip!', TYPE.ERROR)]
+      embeds: [Embed.notify('Error', 'Need at least 3 songs in the queue to shuffle!', TYPE.ERROR)]
     });
   }
   
-  // Parse skip count
-  let skipCount = 1; // Default to 1
-  if (args.length > 0) {
-    const parsedCount = parseInt(args[0]);
-    if (!isNaN(parsedCount) && parsedCount > 0) {
-      skipCount = parsedCount;
-    }
-  }
-  
-  // Make sure we're not trying to skip more songs than exist
-  if (skipCount > queue.songs.length) {
-    skipCount = queue.songs.length;
-  }
-  
   try {
-    const skipped = musicPlayer.skipSongs(guild.id, skipCount);
+    const shuffledCount = musicPlayer.shuffleQueue(guild.id);
     
-    if (skipped) {
-      const skipMessage = skipCount === 1 
-        ? 'Skipped the current song!' 
-        : `Skipped ${skipCount} songs!`;
-      
-      return message.reply({
-        embeds: [Embed.notify('Success', skipMessage, TYPE.SUCCESS)]
-      });
-    } else {
-      return message.reply({
-        embeds: [Embed.notify('Error', 'Failed to skip the song(s).', TYPE.ERROR)]
-      });
-    }
-  } catch (error) {
-    console.error('Error skipping song(s):', error);
     return message.reply({
-      embeds: [Embed.notify('Error', 'An error occurred while trying to skip the song(s).', TYPE.ERROR)]
+      embeds: [Embed.notify('Shuffled', `Successfully shuffled ${shuffledCount} songs in the queue!`, TYPE.SUCCESS)]
+    });
+  } catch (error) {
+    console.error('Error shuffling queue:', error);
+    return message.reply({
+      embeds: [Embed.notify('Error', 'An error occurred while trying to shuffle the queue.', TYPE.ERROR)]
     });
   }
 }

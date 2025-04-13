@@ -177,10 +177,48 @@ class YouTubeAPI {
   async getRecommendations(videoId) {
     try {
       const info = await this.getVideoInfo(videoId);
-      return info.related_videos;
+      
+      // Check for related_videos and try multiple fallback methods
+      let recommendations = [];
+      
+      // Try related_videos first
+      if (info.related_videos && Array.isArray(info.related_videos) && info.related_videos.length > 0) {
+        recommendations = info.related_videos;
+      } 
+      // Try getUpNext method if available
+      else if (typeof info.getUpNext === 'function') {
+        try {
+          const upNext = await info.getUpNext();
+          if (upNext && Array.isArray(upNext) && upNext.length > 0) {
+            recommendations = upNext;
+          }
+        } catch (upNextError) {
+          console.warn('Failed to get upNext recommendations:', upNextError);
+        }
+      }
+      
+      // If still no recommendations, try to search for similar content
+      if (recommendations.length === 0 && info.basic_info && info.basic_info.title) {
+        try {
+          // Use the title to search for similar content
+          const searchQuery = info.basic_info.author ? 
+            `${info.basic_info.author.name} ${info.basic_info.title}` : 
+            info.basic_info.title;
+          
+          console.log(`No recommendations found, searching for: ${searchQuery}`);
+          const searchResults = await this.search(searchQuery, 'mixed');
+          
+          // Filter out the original video
+          recommendations = searchResults.filter(item => item.id !== videoId);
+        } catch (searchError) {
+          console.warn('Failed to get search-based recommendations:', searchError);
+        }
+      }
+      
+      return recommendations;
     } catch (error) {
       console.error('Get recommendations error:', error);
-      throw error;
+      return []; // Return empty array instead of throwing to prevent cascading failures
     }
   }
 
@@ -192,11 +230,25 @@ class YouTubeAPI {
   async getNextVideos(videoId) {
     try {
       const info = await this.getVideoInfo(videoId);
-      // The actual method might vary based on youtubei.js implementation
-      return info.getUpNext ? info.getUpNext() : info.related_videos;
+      
+      // Try getUpNext first, then fall back to related videos
+      if (typeof info.getUpNext === 'function') {
+        try {
+          const upNext = await info.getUpNext();
+          if (upNext && Array.isArray(upNext) && upNext.length > 0) {
+            return upNext;
+          }
+        } catch (upNextError) {
+          console.warn('Failed to get upNext:', upNextError);
+        }
+      }
+      
+      // Fall back to related videos
+      return info.related_videos && Array.isArray(info.related_videos) ? 
+        info.related_videos : [];
     } catch (error) {
       console.error('Get next videos error:', error);
-      throw error;
+      return []; // Return empty array instead of throwing
     }
   }
 
@@ -255,7 +307,7 @@ class YouTubeAPI {
     }
   }
 
-  // /**
+  // /** 
   //  * 
   //  * @param {String} videoId 
   //  * @returns 
