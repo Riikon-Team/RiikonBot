@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import logger from '../../../utils/logger.js';
 import { SlashCommandBuilder } from 'discord.js';
+import { addCommandOption } from '../../../utils/commandUtilities.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -64,31 +65,32 @@ export async function getCommands() {
           if (options.length > 0) {
             for (const option of options) {
               // Handle different option types
+              addCommandOption(command, option)
               // This is a simplified example - expand as needed
               //Will be converted a module for automically add command options
-              if (option.type === 'string') {
-                command.addStringOption(opt =>
-                  opt.setName(option.name)
-                    .setDescription(option.description)
-                    .setRequired(option.required || false));
-              }
-              if (option.type === 'user') {
-                command.addUserOption(opt =>
-                  opt.setName(option.name)
-                    .setDescription(option.description)
-                    .setRequired(option.required || false))
-              }
-              if (option.type === 'integer') {
-                command.addIntegerOption(opt => {
-                  opt.setName(option.name)
-                    .setDescription(option.description)
-                    .setRequired(option.required || false)
+              // if (option.type === 'string') {
+              //   command.addStringOption(opt =>
+              //     opt.setName(option.name)
+              //       .setDescription(option.description)
+              //       .setRequired(option.required || false));
+              // }
+              // if (option.type === 'user') {
+              //   command.addUserOption(opt =>
+              //     opt.setName(option.name)
+              //       .setDescription(option.description)
+              //       .setRequired(option.required || false))
+              // }
+              // if (option.type === 'integer') {
+              //   command.addIntegerOption(opt => {
+              //     opt.setName(option.name)
+              //       .setDescription(option.description)
+              //       .setRequired(option.required || false)
 
-                  if (option.maxValue && typeof option.maxValue === 'number') opt.setMaxValue(option.maxValue)
-                  if (option.minValue && typeof option.minValue === 'number') opt.setMinValue(option.minValue)
-                  return opt
-                })
-              }
+              //     if (option.maxValue && typeof option.maxValue === 'number') opt.setMaxValue(option.maxValue)
+              //     if (option.minValue && typeof option.minValue === 'number') opt.setMinValue(option.minValue)
+              //     return opt
+              //   })
+              // }
               // Add other option types as needed
             }
           }
