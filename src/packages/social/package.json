@@ -1,7 +1,7 @@
 {
   "name": "social",
-  "version": "1.0.0",
-  "description": "Social commands package with some social command like sad, laugh",
+  "version": "1.0.1",
+  "description": "Social commands package with some social basic commands.",
   "main": "index.js",
   "author": "Riikon",
   "type": "module",
