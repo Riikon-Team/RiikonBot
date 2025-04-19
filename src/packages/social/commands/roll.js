@@ -5,7 +5,7 @@ export const config = {
     category: 'Social',
     options: [
         {
-            type: 'number',
+            type: 'integer',
             name: 'max',
             description: 'Max value of this roll',
         }

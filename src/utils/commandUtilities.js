@@ -58,24 +58,24 @@ export const addCommandOption = (command, commandsOption) => {
     }
 
     const typeCommand = new Map([
-        {type: 'string', option: new SlashCommandStringOption()},
-        {type: 'integer', option: new SlashCommandIntegerOption()},
-        {type: 'number', option: new SlashCommandNumberOption()},
-        {type: 'boolean', option: new SlashCommandBooleanOption()},
-        {type: 'user', option: new SlashCommandUserOption()},
-        {type: 'channel', option: new SlashCommandChannelOption()},
-        {type: 'role', option: new SlashCommandRoleOption()},
-        {type: 'mentionable', option: new SlashCommandMentionableOption()},
-        {type: 'attachment', option: new SlashCommandAttachmentOption()},
+        { type: 'string', option: new SlashCommandStringOption() },
+        { type: 'integer', option: new SlashCommandIntegerOption() },
+        { type: 'number', option: new SlashCommandNumberOption() },
+        { type: 'boolean', option: new SlashCommandBooleanOption() },
+        { type: 'user', option: new SlashCommandUserOption() },
+        { type: 'channel', option: new SlashCommandChannelOption() },
+        { type: 'role', option: new SlashCommandRoleOption() },
+        { type: 'mentionable', option: new SlashCommandMentionableOption() },
+        { type: 'attachment', option: new SlashCommandAttachmentOption() },
     ].map(obj => [obj.type, obj.option]))
-    
+
     const option = typeCommand.get(commandsOption)
     option.setName(commandsOption.name)
     option.setDescription(commandsOption.description)
     option.setRequired(commandsOption.required)
     if (type === "number" || type === "integer") {
-        option.setMinValue(commandsOption.min)
-        option.setMaxValue(commandsOption.max)
+        if (commandsOption.min) option.setMinValue(commandsOption.min)
+        if (commandsOption.max) option.setMaxValue(commandsOption.max)
     }
     if (type === "string") {
         option.setMinLength(commandsOption.min)
