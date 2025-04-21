@@ -5,6 +5,7 @@ export const config = {
     name: 'sus',
     description: "You feel something so susssssspicious",
     category: 'Social',
+    package: 'social',
     options: []
 }
 

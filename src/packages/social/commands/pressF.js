@@ -8,6 +8,7 @@ export const config = {
     name: 'f',
     description: 'Press F to pay respect',
     category: 'Meme',
+    package: 'social',
     options: []
 }
 

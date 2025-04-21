@@ -8,6 +8,7 @@ export const config = {
     name: 'abs_cinema',
     description: 'Absolute Cinema ✋🤯🤚 ',
     category: 'Meme',
+    package: 'social',
     options: [
         {
             type: 'string',

@@ -3,6 +3,7 @@ export const config = {
     name: 'roll',
     description: 'Just a roll, start from 1 to 100 :D',
     category: 'Social',
+    package: 'social',
     options: [
         {
             type: 'number',
