@@ -113,7 +113,7 @@ export function getAllMusicCommands() {
     return {
       name,
       ...command.config,
-      package: command.config.package || 'ytmusic',
+      package: command.config?.package || 'ytmusic',
     };
   })
   

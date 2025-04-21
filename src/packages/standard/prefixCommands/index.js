@@ -81,6 +81,6 @@ export function getAllPrefixCommands() {
   return Array.from(prefixCommands.entries()).map(([name, command]) => ({
     name,
     ...command.config,
-    package: command.config.package || 'standard',
+    package: command.config?.package || 'standard',
   }));
 }

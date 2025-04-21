@@ -81,11 +81,11 @@
               </div>
               <div class="d-flex justify-content-between mb-2" v-if="guild.stats">
                 <span class="text-muted">Channels:</span>
-                <span class="ms-2">{{ guild.stats.channelCount || 'N/A' }}</span>
+                <span class="ms-2">{{ guild.stats.channels.total || 'N/A' }}</span>
               </div>
               <div class="d-flex justify-content-between" v-if="guild.stats">
                 <span class="text-muted">Roles:</span>
-                <span class="ms-2">{{ guild.stats.roleCount || 'N/A' }}</span>
+                <span class="ms-2">{{ guild.stats.roles.total || 'N/A' }}</span>
               </div>
             </div>
           </div>

@@ -2,6 +2,7 @@ import express from 'express';
 import logger from '../../utils/logger.js';
 import prisma from '../../utils/prisma.js';
 import { isAuthenticated } from './middleware.js';
+import { getAllPrefixCommands } from '../../utils/commandUtilities.js';
 
 const router = express.Router();
 
@@ -10,7 +11,7 @@ router.get('/commands', isAuthenticated, async (req, res) => {
   try {
     const client = req.discordClient;
     const packageManager = req.packageManager;
-    
+
     if (!client) {
       logger.warn('Discord client not available when fetching commands');
       return res.status(500).json({ error: 'Discord client not initialized' });
@@ -90,36 +91,47 @@ router.get('/commands', isAuthenticated, async (req, res) => {
     }
     
     // Safely retrieve prefix commands if they exist
-    if (client.prefixCommands && typeof client.prefixCommands.values === 'function') {
-      prefixCommands = Array.from(client.prefixCommands.values())
-        .filter(cmd => cmd && cmd.config)
-        .map(cmd => ({
-          name: cmd.config.name,
-          description: cmd.config.description || 'No description',
+    // if (client.prefixCommands && typeof client.prefixCommands.values === 'function') {
+    //   prefixCommands = Array.from(client.prefixCommands.values())
+    //     .filter(cmd => cmd && cmd.config)
+    //     .map(cmd => ({
+    //       name: cmd.config.name,
+    //       description: cmd.config.description || 'No description',
+    //       type: 'PREFIX',
+    //       category: cmd.config.category || 'Uncategorized',
+    //       enabled: true, // Default status
+    //       package: cmd.config.package || 'unknown'
+    //     }));
+    // } else if (packageManager && packageManager.getAllPrefixCommands) {
+    //   // Try to get prefix commands from package manager as an alternative
+    //   try {
+    //     prefixCommands = await getAllPrefixCommands()
+    //     prefixCommands.map(cmd => ({
+    //         name: cmd.name,
+    //         description: cmd.description || 'No description',
+    //         type: 'PREFIX',
+    //         category: cmd.category || 'Uncategorized',
+    //         enabled: true, // Default status
+    //         package: cmd.package || 'unknown'
+    //       }));
+    //   } catch (prefixError) {
+    //     logger.warn('Failed to get prefix commands from package manager:', prefixError);
+    //   }
+    // }
+
+    try {
+      prefixCommands = await getAllPrefixCommands()
+      prefixCommands = prefixCommands.map(cmd => ({
+          name: cmd.name,
+          description: cmd.description || 'No description',
           type: 'PREFIX',
-          category: cmd.config.category || 'Uncategorized',
+          category: cmd.category || 'Uncategorized',
           enabled: true, // Default status
-          package: cmd.config.package || 'unknown'
+          package: cmd.package || 'unknown'
         }));
-    } else if (packageManager && packageManager.getAllPrefixCommands) {
-      
-      // Try to get prefix commands from package manager as an alternative
-      try {
-        
-        prefixCommands = packageManager.getAllPrefixCommands()
-          .map(cmd => ({
-            name: cmd.name,
-            description: cmd.description || 'No description',
-            type: 'PREFIX',
-            category: cmd.category || 'Uncategorized',
-            enabled: true, // Default status
-            package: cmd.package || 'unknown'
-          }));
-      } catch (prefixError) {
-        logger.warn('Failed to get prefix commands from package manager:', prefixError);
-      }
+    } catch (prefixError) {
+      logger.warn('Failed to get prefix commands from package manager:', prefixError);
     }
-    
     // Add command status from database if available
     try {
       const dbCommands = await prisma.command.findMany();
