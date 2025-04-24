@@ -1,9 +1,10 @@
-import fs from 'fs';
+import fs, { readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import logger from '../../../utils/logger.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(path.join(__dirname, "..", "package.json"), 'utf-8'))
 
 // Command collection
 const prefixCommands = new Map();
@@ -82,5 +83,6 @@ export function getAllPrefixCommands() {
     name,
     ...command.config,
     package: command.config?.package || 'social',
+    prefix: pkg.config.prefix
   }));
 }

@@ -92,7 +92,7 @@
               <tbody>
                 <tr v-for="command in filteredAndSortedCommands" :key="command.name + command.type">
                   <td>
-                    <span class="fw-bold">{{ command.name }}</span>
+                    <span class="fw-bold">{{ command.prefix ? command.prefix : ""}}{{ command.name }}</span>
                     <div v-if="command.aliases && command.aliases.length" class="text-muted small">
                       Aliases: {{ command.aliases.join(', ') }}
                     </div>

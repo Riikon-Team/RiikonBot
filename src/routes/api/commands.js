@@ -127,7 +127,8 @@ router.get('/commands', isAuthenticated, async (req, res) => {
           type: 'PREFIX',
           category: cmd.category || 'Uncategorized',
           enabled: true, // Default status
-          package: cmd.package || 'unknown'
+          package: cmd.package || 'unknown',
+          prefix: cmd.prefix
         }));
     } catch (prefixError) {
       logger.warn('Failed to get prefix commands from package manager:', prefixError);
