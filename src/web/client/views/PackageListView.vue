@@ -1,6 +1,6 @@
 <template>
   <div class="packages-page">
-    <h1 class="mb-4">Packages</h1>
+    <h2 class="mb-4">Packages</h2>
     
     <!-- Loading state -->
     <div v-if="loading" class="text-center p-5">

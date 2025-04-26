@@ -1,7 +1,7 @@
 <template>
   <div class="guilds-page">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1>Servers</h1>
+      <h2>Servers</h2>
       <div class="search-box">
         <div class="input-group">
           <input 
