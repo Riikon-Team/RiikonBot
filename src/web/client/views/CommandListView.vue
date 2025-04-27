@@ -188,7 +188,6 @@ export default {
     filteredAndSortedCommands() {
       // First, filter by search query and type
       let filtered = this.commands;
-      console.log(this.commands)
       if (this.typeFilter !== 'all') {
         filtered = filtered.filter(cmd => cmd.type === this.typeFilter);
       }
