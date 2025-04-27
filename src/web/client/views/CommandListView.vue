@@ -1,7 +1,7 @@
 <template>
   <div class="commands-page">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1>Commands</h1>
+      <h2>Commands</h2>
       <div class="search-box">
         <div class="input-group">
           <input 
@@ -92,7 +92,7 @@
               <tbody>
                 <tr v-for="command in filteredAndSortedCommands" :key="command.name + command.type">
                   <td>
-                    <span class="fw-bold">{{ command.name }}</span>
+                    <span class="fw-bold">{{ command.prefix ? command.prefix : ""}}{{ command.name }}</span>
                     <div v-if="command.aliases && command.aliases.length" class="text-muted small">
                       Aliases: {{ command.aliases.join(', ') }}
                     </div>
@@ -188,7 +188,6 @@ export default {
     filteredAndSortedCommands() {
       // First, filter by search query and type
       let filtered = this.commands;
-      
       if (this.typeFilter !== 'all') {
         filtered = filtered.filter(cmd => cmd.type === this.typeFilter);
       }

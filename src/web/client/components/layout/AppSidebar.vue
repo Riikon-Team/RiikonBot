@@ -34,7 +34,7 @@ export default {
       type: Array,
       default: () => [
         { path: '/', label: 'Dashboard', icon: 'bi-house-door' },
-        { path: '/guilds', label: 'Servers', icon: 'bi-server' },
+        { path: '/guilds', label: 'Servers', icon: 'bi-database' },
         { path: '/commands', label: 'Commands', icon: 'bi-terminal' },
         { path: '/packages', label: 'Packages', icon: 'bi-box' }
       ]

@@ -106,13 +106,13 @@ export default {
       botInfo: null,
       stats: null,
       statCards: [
-        { key: 'guilds', label: 'Servers', icon: 'bi-server', color: '#0eaae3' },
+        { key: 'guilds', label: 'Servers', icon: 'bi-database', color: '#0eaae3' },
         { key: 'users', label: 'Users', icon: 'bi-people', color:'#f57a22' },
         { key: 'commands', label: 'Commands', icon: 'bi-terminal', color: '#d41c2e' },
         { key: 'packagesStatus', label: 'Packages', icon: 'bi-box', color: '#13ad2a' },
       ],
       quickActions: [
-        { label: 'Manage Servers', path: '/guilds', color: '#0eaae3', icon: 'bi-server' },
+        { label: 'Manage Servers', path: '/guilds', color: '#0eaae3', icon: 'bi-database' },
         { label: 'View Commands', path: '/commands', color: '#0eaae3', icon: 'bi-terminal' },
         { label: 'Manage Packages', path: '/packages', color: '#0eaae3', icon: 'bi-box' },
         { label: 'View Statistics', path: '/stats', color: '#0eaae3', icon: 'bi-graph-up' }

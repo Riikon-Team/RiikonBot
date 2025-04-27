@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-12">
-        <h1 class="mb-4">Package Management</h1>
+        <h2 class="mb-4">Package Management</h2>
         
         <div v-if="loading" class="text-center my-5">
           <div class="spinner-border" role="status">
