@@ -8,6 +8,7 @@ import PackageDetailView from './views/PackageDetailView.vue';
 import LoginView from './views/LoginView.vue';
 import ErrorView from './views/ErrorView.vue';
 import StatsVisualizationView from './views/StatsVisualizationView.vue';
+import CommandDetailView from './views/CommandDetailView.vue';
 
 const routes = [
   {
@@ -34,6 +35,11 @@ const routes = [
     path: '/commands',
     name: 'commands',
     component: CommandListView
+  },
+  {
+    path: '/commands/:package/:name',
+    name: 'commands-package-detail',
+    component: CommandDetailView
   },
   {
     path: '/packages',
