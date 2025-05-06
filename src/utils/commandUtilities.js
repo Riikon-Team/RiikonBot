@@ -10,7 +10,7 @@ export const displayCurrentTime = () => {
 export const getAllPrefixCommands = async () => {
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
     const packagesDir = path.join(path.dirname(__dirname), 'packages');
-    const pkgNames = fs.readdirSync(packagesDir);
+    const pkgNames = await fs.promises.readdir(packagesDir);
     const result = []
 
     for (const pkgName of pkgNames) {
