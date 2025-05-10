@@ -2,6 +2,7 @@ export const config = {
     name: 'owo',
     description: "Don't know what to say? Just OwO",
     category: 'Social',
+    package: 'social',
     options: []
 }
 

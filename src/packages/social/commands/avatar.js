@@ -5,6 +5,7 @@ export const config = {
     name: 'avatar',
     description: 'Show avatar of a user',
     category: 'Social',
+    package: 'social',
     options: [
         {
             type: 'user',
@@ -23,5 +24,5 @@ export async function execute(interaction, client) {
         .setTitle("Here is avatar of " + targetUser.username)
         .setImage(url)
         .setDescription(`[Avatar URL](${url})`)
-    await interaction.reply({embeds: [embed]})
+    await interaction.reply({ embeds: [embed] })
 }
