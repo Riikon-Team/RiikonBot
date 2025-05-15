@@ -5,6 +5,7 @@ export const config = {
     name: 'bonk',
     description: 'Bonk someone you want :D',
     category: 'Social',
+    package: 'social',
     options: [
         {
             type: 'user',

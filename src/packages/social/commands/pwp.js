@@ -5,6 +5,7 @@ export const config = {
     name: 'pwp',
     description: "Are you sure this is a typo? ≖w≖",
     category: 'Social',
+    package: 'social',
     options: []
 }
 

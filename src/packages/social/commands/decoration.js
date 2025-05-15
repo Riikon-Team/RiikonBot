@@ -5,6 +5,7 @@ export const config = {
     name: 'avatar_decoration',
     description: 'Get avatar decoration of a user',
     category: 'Social',
+    package: 'social',
     options: [
         {
             type: 'user',

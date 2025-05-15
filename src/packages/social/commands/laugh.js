@@ -12,6 +12,7 @@ export const config = {
     name: 'laugh',
     description: 'Send a LOL emote',
     category: 'Social',
+    package: 'social',
     options: []
 }
 
