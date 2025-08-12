@@ -82,7 +82,22 @@ export async function startBot(packageManager) {
     logger.error('Discord client error:', error);
     await packageManager.emitEvent('error', error);
   });
-  
+
+  client.on(Events.Warn, async (warning) => {
+    logger.warn('Discord client warning:', warning);
+    await packageManager.emitEvent('warn', warning);
+  });
+
+  // Voice Events
+  client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
+    await packageManager.emitEvent('voiceStateUpdate', oldState, newState, client);
+  });
+
+  client.on(Events.VoiceServerUpdate, async (voiceServer) => {
+    await packageManager.emitEvent('voiceServerUpdate', voiceServer, client);
+  });
+
+
   // Initialize packages with client
   await packageManager.initializePackages(client);
   

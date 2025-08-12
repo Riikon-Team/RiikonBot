@@ -23,6 +23,12 @@ export async function initialize(client, manager, packageConfig) {
   // Set up bot token and chat ID from environment variables or config
   botToken = process.env.TELEGRAM_BOT_TOKEN || config.botToken;
   chatId = process.env.TELEGRAM_CHAT_ID || config.chatId;
+  const enabled = process.env.TELEGRAM_ENABLED || false ? chatId : null;
+
+  if (!enabled) {
+    logger.warn('Telegram logger is not enabled. Please set TELEGRAM_ENABLED to true.');
+    return;
+  }
   
   if (!botToken || !chatId) {
     logger.warn('Telegram logger not fully configured. Please set botToken and chatId in configuration.');

@@ -18,7 +18,6 @@ class PackageManager {
     this.defaultPackage = null;
   }
   
-  // Register an event listener from a package
   registerEventListener(eventName, callback, packageName) {
     if (!this.events.has(eventName)) {
       this.events.set(eventName, []);
@@ -29,10 +28,9 @@ class PackageManager {
       packageName
     });
     
-    logger.debug(`Package ${packageName} registered event listener for ${eventName}`);
+    logger.debug(`Package [${packageName}] registered event listener for [${eventName}]`);
   }
   
-  // Register a web route for a package
   registerWebRoute(routePath, routeHandler, packageName, viewsPath = null) {
     this.webRoutes.set(packageName, {
       path: routePath,
@@ -44,7 +42,6 @@ class PackageManager {
     return true;
   }
   
-  // Get all web routes
   getWebRoutes() {
     return this.webRoutes;
   }
@@ -133,9 +130,9 @@ class PackageManager {
       if (pkg && pkg.enabled && pkg.module.initialize) {
         try {
           await pkg.module.initialize(client, this, pkg.config);
-          logger.info(`Initialized default package: ${this.defaultPackage}`);
+          logger.info(`Initialized default package: [${this.defaultPackage}]`);
         } catch (error) {
-          logger.error(`Failed to initialize default package ${this.defaultPackage}:`, error);
+          logger.error(`Failed to initialize default package [${this.defaultPackage}]:`, error);
         }
       }
     }
@@ -145,9 +142,9 @@ class PackageManager {
       if (name !== this.defaultPackage && pkg.enabled && pkg.module.initialize) {
         try {
           await pkg.module.initialize(client, this, pkg.config);
-          logger.info(`Initialized package: ${name}`);
+          logger.info(`Initialized package: [${name}]`);
         } catch (error) {
-          logger.error(`Failed to initialize package ${name}:`, error);
+          logger.error(`Failed to initialize package [${name}]:`, error);
         }
       }
     }

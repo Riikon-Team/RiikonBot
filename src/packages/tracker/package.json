@@ -1,0 +1,15 @@
+{
+  "name": "tracker",
+  "version": "1.0.0",
+  "description": "Tracker commands package with core functionality including ping and help",
+  "main": "index.js",
+  "author": "Riikon",
+  "type": "module",
+  "isDefault": false,
+  "config": {
+    "prefix": "k!",
+    "enabled": true,
+    "color": "#0099ff",
+    "title": "RiikonBot"
+  }
+}
