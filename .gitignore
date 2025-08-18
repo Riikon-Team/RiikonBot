@@ -136,6 +136,9 @@ dist
 .pnp.*
 
 data
-bin
 
 static
+
+bin/last_update_check.txt
+bin/yt-dlp
+bin/yt-dlp.exe
