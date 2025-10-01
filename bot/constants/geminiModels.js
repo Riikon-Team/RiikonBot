@@ -24,20 +24,20 @@ export const GEMINI_MODELS = {
             "Limited context window compared to larger models"
         ]
     },
-    GEMINI_2_5_IMAGE: {
-        id: GEMINI_2_5_IMAGE,
-        description: "A model optimized for image-related tasks, including image generation, captioning, and understanding visual content.",
-        capabilities: [
-            "Image Generation",
-            "Image Captioning",
-            "Visual Content Analysis",
-            "Multimodal Understanding"
-        ],
-        limitations: [
-            "Not suitable for text-only tasks",
-            "May have limitations in understanding complex visual scenes"
-        ]
-    },
+    // GEMINI_2_5_IMAGE: {
+    //     id: GEMINI_2_5_IMAGE,
+    //     description: "A model optimized for image-related tasks, including image generation, captioning, and understanding visual content.",
+    //     capabilities: [
+    //         "Image Generation",
+    //         "Image Captioning",
+    //         "Visual Content Analysis",
+    //         "Multimodal Understanding"
+    //     ],
+    //     limitations: [
+    //         "Not suitable for text-only tasks",
+    //         "May have limitations in understanding complex visual scenes"
+    //     ]
+    // },
     GEMINI_2_5_LITE: {
         id: GEMINI_2_5_LITE,
         description: "A balanced model that offers a good trade-off between performance and speed, suitable for a variety of applications.",

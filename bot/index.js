@@ -68,10 +68,15 @@ const startBot = async () => {
     // Create Helpdocs
     client.helpDocs = genarateHelpDoc(client.commands, client.prefixCommands);
 
-    // Create Chat Session Map
-    client.chatSessions = new Map();
+    // Create Chat History Map and Attachments Map
+    client.chatHistory = new Map();
+    client.chatLastAttachments = new Map();
 
-    
+    // Create voice connections map
+    client.voiceConnections = new Map();
+
+    // Create Audio Players map
+    client.audioPlayers = new Map();
 
     // Login to Discord with your client's token
     await client.login(DISCORD_TOKEN);
