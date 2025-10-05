@@ -56,7 +56,7 @@ const validateEnvVariables = () => {
   }
 };
 
-validateEnvVariables();
+// validateEnvVariables();
 
 export const E = {
   "warning": "<:warning:1360826772047699988>",
