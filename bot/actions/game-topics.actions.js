@@ -1,28 +1,26 @@
-import { EmbedBuilder } from 'discord.js';
+import { iEmbedBuilder } from '../utils/iEmbedBuilder.js';
 import { GiftcodeHoyoverseGame } from '../functions/game-topics.js';
 import { GIFT_CODES } from '../constants/game-topics.js';
+import { E } from '../constants/bot.js';
 
 const createHyperlink = (text, url) => { 
     if (!url) return text;
     return `[${text}](${url})`;
 }
 
-export const getGiftcodeAction = async (commandName, gameName = 'hkrpg', client = null) => {
+export const getGiftcodeAction = async (ctx, {gameName = 'hkrpg'}) => {
     try {
-        // Call the function to get data
-        const result = await GiftcodeHoyoverseGame.execute(client, gameName);
+        const result = await GiftcodeHoyoverseGame.execute(ctx.client, gameName);
         const game = GIFT_CODES[gameName.toLowerCase()];
 
-        // Handle errors
         if (result.error) {
-            const embed = new EmbedBuilder()
-                .setTitle('❌ Lỗi!')
+            const embed = new iEmbedBuilder(ctx)
+                .setTitle(`${E.error} Lỗi!`)
                 .setDescription(
                     result.message || 'Không thể lấy mã code vào lúc này. Vui lòng thử lại sau.'
                 )
                 .setColor('#ff0000')
-                .setTimestamp()
-                .setFooter({ text: `${commandName ? `/${commandName}` : 'Gift Code Command'}` });
+                .setTimestamp();
 
             if (result.validGames) {
                 embed.addFields(
@@ -35,27 +33,24 @@ export const getGiftcodeAction = async (commandName, gameName = 'hkrpg', client 
                 );
             }
 
-            return { embeds: [embed] };
+            return ctx.reply({ embeds: [embed] });
         }
 
         // Handle empty codes
         if (result.codes.length === 0) {
-            const embed = new EmbedBuilder()
+            const embed = new iEmbedBuilder(ctx)
                 .setTitle('📭 Không có mã code')
                 .setDescription(`Hiện tại không có mã code nào đang hoạt động cho **${result.game.name}**. Vui lòng thử lại sau!`)
                 .setColor('#ffaa00')
-                .setTimestamp()
-                .setFooter({ text: `${commandName ? `/${commandName}` : 'Gift Code Command'}` });
-            return { embeds: [embed] };
+                .setTimestamp();
+            return ctx.reply({ embeds: [embed] });
         }
 
         // Create success embed
-        const embed = new EmbedBuilder()
+        const embed = new iEmbedBuilder(ctx)
             .setTitle(`🎁 Gift Codes cho ${result.game.name}`)
             .setDescription(
-                `Tìm thấy **${result.totalCodes}** mã code đang hoạt động! ` +
-                'Click vào mã code để tự động mở trang redeem.\n\n' +
-                '💡 *Hãy nhanh tay sử dụng trước khi hết hạn!*'
+                `Tìm thấy **${result.totalCodes}** mã code đang hoạt động! Click vào mã code để tự động mở trang redeem.\n\n💡 *Hãy nhanh tay sử dụng trước khi hết hạn!*`
             )
             .setColor('#00ff00')
             .setTimestamp();
@@ -93,12 +88,12 @@ export const getGiftcodeAction = async (commandName, gameName = 'hkrpg', client 
             text: `${commandName ? `/${commandName}` : 'Gift Code Command'}`,
         });
 
-        return { embeds: [embed] };
+        return ctx.reply({ embeds: [embed] });
 
     } catch (error) {
         console.error('Error in getGiftcodeAction:', error);
-        
-        const errorEmbed = new EmbedBuilder()
+
+        const errorEmbed = new iEmbedBuilder(ctx)
             .setTitle('Lỗi hệ thống!')
             .setDescription('Đã xảy ra lỗi khi lấy mã gift code. Vui lòng thử lại sau ít phút.')
             .addFields({
@@ -107,10 +102,9 @@ export const getGiftcodeAction = async (commandName, gameName = 'hkrpg', client 
                 inline: false
             })
             .setColor('#ff0000')
-            .setTimestamp()
-            .setFooter({ text: `${commandName ? `/${commandName}` : 'Gift Code Command'}` });
+            .setTimestamp();
 
-        return { embeds: [errorEmbed] };
+        return ctx.reply({ embeds: [errorEmbed] });
     }
 }
 

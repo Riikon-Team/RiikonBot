@@ -1,7 +1,7 @@
 import { Client, GatewayIntentBits, IntentsBitField, Events, Collection } from 'discord.js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { DISCORD_TOKEN } from './constants/bot.js';
 import { genarateHelpDoc } from './utils/helpdoc.js';
 
@@ -11,11 +11,13 @@ const __dirname = path.dirname(__filename);
 const startBot = async () => {
     const client = new Client({
         intents: [
-            GatewayIntentBits.GuildPresences,     
+            GatewayIntentBits.GuildPresences,
             GatewayIntentBits.Guilds,
             GatewayIntentBits.GuildMessages,
             GatewayIntentBits.MessageContent,
-            GatewayIntentBits.GuildMembers,        
+            GatewayIntentBits.GuildMembers,
+            GatewayIntentBits.GuildVoiceStates,
+            GatewayIntentBits.DirectMessages,
         ],
     });
 
@@ -26,12 +28,14 @@ const startBot = async () => {
 
     for (const file of prefixCommandFiles) {
         const filePath = path.join(prefixCommandsPath, file);
-        const commandModule = await import(filePath);
-        const command = commandModule.default;
-        if ('data' in command && 'execute' in command) {
-            client.prefixCommands.set(command.data.name, command);
-        } else {
-            console.log(`[WARNING] The prefix command at ${filePath} is missing a required "data" or "execute" property.`);
+        const commandModules = await import(filePath);
+        const commands = commandModules.default;
+        for (const command of commands) {
+            if ('data' in command && 'execute' in command) {
+                client.prefixCommands.set(command.data.name, command);
+            } else {
+                console.log(`[WARNING] The prefix command at ${filePath} is missing a required "data" or "execute" property.`);
+            }
         }
     }
 
@@ -53,14 +57,19 @@ const startBot = async () => {
 
     for (const file of commandFiles) {
         const filePath = path.join(commandsPath, file);
-        const commandModule = await import(filePath);
-        const command = commandModule.default; 
-        if ('data' in command && 'execute' in command) {
-            client.commands.set(command.data.name, command);
-        } else {
-            console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+        const commandModules = await import(filePath);
+        const commands = commandModules.default;
+        for (const command of commands) {
+            if ('data' in command && 'execute' in command) {
+                client.commands.set(command.data.name, command);
+            } else {
+                console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+            }
         }
     }
+
+    // Debug commands
+    console.log(`Loaded ${client.commands.size} slash commands and ${client.prefixCommands.size} prefix commands.`);
 
     // Timeout collection for commands and interactions
     client.timeoutCollection = new Collection();
@@ -69,6 +78,7 @@ const startBot = async () => {
     client.helpDocs = genarateHelpDoc(client.commands, client.prefixCommands);
 
     // Create Chat History Map and Attachments Map
+    client.chatSessions = new Map();
     client.chatHistory = new Map();
     client.chatLastAttachments = new Map();
 
@@ -77,6 +87,10 @@ const startBot = async () => {
 
     // Create Audio Players map
     client.audioPlayers = new Map();
+
+    // Create Music Players map for new music system
+    client.musicPlayers = new Map();
+    client.musicSearchResults = new Map();
 
     // Login to Discord with your client's token
     await client.login(DISCORD_TOKEN);

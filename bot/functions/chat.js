@@ -1,5 +1,5 @@
 import { MAX_CHAT_HISTORY } from '../constants/config.js';
-import { getChannelChatHistory } from '../utils/getChat.js';
+import { getChannelChatHistory } from '../utils/chat.js';
 
 export const GetChannelChatHistory = {
     data: {

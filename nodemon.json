@@ -1,0 +1,20 @@
+{
+  "watch": ["bot/**/*", "index.js"],
+  "ignore": [
+    "node_modules/**/*",
+    "*.log",
+    "*.db",
+    "*.sqlite",
+    ".git",
+    "temp/**/*",
+    "cache/**/*",
+    "data/**/*",
+    "temp/**/*",
+    "bin/**/*"
+  ],
+  "ext": "js,json",
+  "delay": 1000,
+  "execMap": {
+    "js": "node"
+  }
+}

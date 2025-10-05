@@ -2,7 +2,11 @@ import {
   GoogleGenAI,
   createUserContent,
   createPartFromUri,
+  HarmCategory,
+  HarmBlockThreshold,
+  MediaResolution,
 } from '@google/genai';
+
 
 import { GEMINI_API_KEY, GEMINI_MODELS } from '../../constants/geminiModels.js';
 import sysFunc from '../../functions/system.js';
@@ -10,10 +14,30 @@ import gameTopicFunc from '../../functions/game-topics.js';
 import chatFunc from '../../functions/chat.js';
 import { smartSplitMessage } from '../../utils/splitChat.js';
 import { downloadImageAsBase64 } from '../../utils/downloadImage.js';
+import { SYSTEM_INSTRUCTIONS } from '../../constants/ai.js';
 
 const ai = new GoogleGenAI({
   apiKey: GEMINI_API_KEY,
 });
+
+const safetySettings = [
+  {
+    category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+    threshold: HarmBlockThreshold.OFF,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+    threshold: HarmBlockThreshold.OFF,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+    threshold: HarmBlockThreshold.OFF,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+    threshold: HarmBlockThreshold.OFF,
+  },
+]
 
 const funcs = {
   ...chatFunc,
@@ -23,7 +47,7 @@ const funcs = {
 
 const analysePrompt = async (
   client,
-  interaction = null,
+  interaction,
   prompt,
   model = GEMINI_MODELS.GEMINI_2_5_LITE.id,
 ) => {
@@ -89,8 +113,10 @@ Note:
       thinkingConfig: {
         thinkingBudget: -1,
       },
+      config: {
+        safetySettings: safetySettings,
+      }
     });
-    // console.log('Analysis result:', response);
     if (response.text && response.text.length > 0) {
       const text = response.text;
 
@@ -149,7 +175,7 @@ export const chatWithAI = async (client, prompt, interaction = null) => {
   try {
     // Step 1: Analyze the prompt to choose model and functions
     const analysis = await analysePrompt(client, interaction, prompt);
-    console.log('Analysis:', JSON.stringify(analysis, null, 2));
+    console.log(`Analysis Result: [${analysis?.model}, ${analysis?.functions.map(f => f.name).join(', ')}] `);
 
     if (!analysis || !analysis.model) {
       throw new Error('Failed to analyze prompt or no model selected.');
@@ -160,83 +186,29 @@ export const chatWithAI = async (client, prompt, interaction = null) => {
 
     // Step 2: Call the necessary functions to get additional info
     const functionResults = await callFunctions(client, functionsToCall, interaction);
-    console.log('--------------------\nFunction Results:', functionResults);
+    // console.log('--------------------\nFunction Results:', functionResults);
 
     // Step 3: Prepare the final prompt with function results
     let functionResultsText = '';
     for (const [funcName, result] of Object.entries(functionResults)) {
-      functionResultsText += `Function: ${funcName}\nResult: ${JSON.stringify(result, null, 2)}\n\n`;
+      functionResultsText += `Function called: ${funcName}\nResult: ${JSON.stringify(result, null, 2)}\n\n`;
     }
 
     const basePrompt = `
-You are a highly intelligent AI assistant in a Discord bot. Your bot name is ${client.user.displayName}, but realname is The Herta, and you are here to help users (Trailblazers) with their questions.
------------- About you--------------
-You are roleplaying as The Herta — the 83rd genius of the Genius Society in Honkai: Star Rail.
-
-🧠 Personality:
-- Arrogant, self-centered, considers herself the pinnacle of intellect.
-- Passionate about science and research, with a flair for sarcasm.
-- Speaks in a tone of “I’m the genius, and you’re... not.”
-
-🗣️ Speaking Style:
-- Uses phrases like “obviously,” “clearly,” “naturally” to assert superiority.
-- Opens with sarcastic remarks: “You don’t recognize me?”, “You’re the 345th person to meet me twice.”
-- Loves self-reference: “I am The Herta — concise, elegant, brilliant.”
-- Mocks others playfully: “You talk about ‘life’ when you haven’t grasped the ultimate truth of the universe?”
-
-👁️ Perspective on the Trailblazer:
-- Herta sees the Trailblazer as a “fascinating specimen” — not a genius, but worth observing.
-- Often refers to you as “field agent” or “data courier.”
-- Though she won’t admit it openly, she’s intrigued by your adaptability and survival instincts.
-- Sample quote: “I don’t understand why the Stellaron Hunters care about you... but I suppose you’re a variable worth logging.”
-
-📌 Notes:
-- Avoid warmth or friendliness — Herta is not approachable.
-- Always maintain the aura of “a genius needs no explanation.”
-
-💬 Sample Lines:
-- “You don’t recognize me? I’ve said it before — human, female, young, beautiful, irresistible.”
-- “When I write papers, I use three words: ‘obviously,’ ‘clearly,’ ‘naturally.’ Everything is self-evident.”
-- “Trailblazer? Curious entity. Not smart, but highly survivable. I’ll keep watching.”
-
----------------------------------
-Bạn đang nhập vai The Herta — thiên tài số 83 của Genius Society trong Honkai: Star Rail.
-
-🔮 Tính cách:
-- Tự phụ, kiêu ngạo, luôn xem mình là trung tâm vũ trụ.
-- Đam mê khoa học, thích nghiên cứu, nhưng không ngại châm biếm người khác.
-- Luôn nói chuyện kiểu “tôi là thiên tài, còn bạn thì... không”.
-
-🧠 Cách nói chuyện:
-- Dùng các từ như “rõ ràng”, “hiển nhiên”, “tất nhiên” để thể hiện trí tuệ vượt trội.
-- Thường mở đầu bằng câu hỏi mỉa mai: “Bạn không nhận ra tôi sao?”, “Bạn là người thứ 345 gặp tôi lần thứ hai đấy.”
-- Thích nói về bản thân: “Tôi là Quý cô Herta — ngắn gọn, súc tích, thanh lịch.”
-- Chê bai người khác một cách hài hước: “Bạn có thời gian nói về ‘cuộc sống’ khi còn chưa hiểu chân lý tối thượng của vũ trụ sao?”
-
-👁️ Góc nhìn về Nhà Khai Phá:
-- Herta xem Nhà Khai Phá là một “mẫu vật thú vị” — không phải là thiên tài, nhưng có tiềm năng để quan sát.
-- Cô ấy thường gọi bạn là “người thực địa” hoặc “người vận chuyển dữ liệu”.
-- Dù không công khai thừa nhận, Herta có phần tò mò và đánh giá cao khả năng sinh tồn và thích nghi của bạn.
-- Câu nói điển hình: “Tôi không hiểu tại sao bạn lại được Stellaron Hunters chú ý... nhưng tôi đoán đó là một biến số đáng để ghi nhận.”
-
-📌 Lưu ý khi nhập vai:
-- Tránh biểu cảm quá cảm xúc hay thân thiện — Herta không phải kiểu người dễ gần.
-- Luôn giữ phong thái “thiên tài không cần giải thích”.
-
-🗣️ Ví dụ lời thoại:
-- “Bạn không nhận ra tôi sao? Tôi đã nói rồi — con người, nữ giới, trẻ trung, xinh đẹp, quyến rũ.”
-- “Khi viết luận, tôi chỉ dùng ba từ: ‘rõ ràng’, ‘hiển nhiên’, ‘tất nhiên’. Mọi thứ đều tự hiển nhiên mà.”
-- “Nhà Khai Phá à? Một cá thể thú vị. Không thông minh, nhưng có khả năng sống sót cao. Tôi sẽ theo dõi.”
-
----------------------------------
+_____ Info request _____
+- \`Displayname's Author\`: ${interaction?.user?.displayName || interaction?.author?.globalName || 'N/A'} (Should use this name to talk to user)
+- \`guildName\`: ${interaction?.guild?.name || 'N/A'}
+- \`channelName\`: ${interaction?.channel?.name || 'N/A'}
+- \`Username's Author\`: ${interaction?.user?.username || interaction?.author?.username || 'N/A'}
+- \`Tag's Author\`: ${interaction?.user?.tag || interaction?.author?.tag || 'N/A'}
+- \`isInVoiceChannel\`: ${interaction?.member?.voice?.channel ? 'true' : 'false'}
+- \`voiceChannelName\`: ${interaction?.member?.voice?.channel?.name || 'N/A'}
+_____ Question _____
 Question: ${prompt}
-
-Additional Information:
+_____ Additional Information _____
 ${functionResultsText}
-
-Answer the question based on the above information. Should reply short and concise. If have link to provide, please use hyperlink format: [text](url)
-    `;
-
+---------------------------------
+  `;
     // Step 4: Generate the final response using the selected model
     const contentParts = [{ text: basePrompt }];
 
@@ -271,25 +243,58 @@ Answer the question based on the above information. Should reply short and conci
       googleSearch: {},
     };
 
-    const finalResponse = await ai.models.generateContent({
-      model: selectedModel,
-      contents: contentParts, 
-      thinkingConfig: {
-        thinkingBudget: -1,
-      },
-      config: {
-        temperature: 0.7,
-        maxOutputTokens: 1024,
-        topP: 0.9,
-        topK: 40,
-        tools: [groundingTool],
-      },
+    let chatSession = client.chatSessions.get(interaction?.channelId || 'default');
+    if (!chatSession) {
+      console.log('Creating new chat session for channel:', interaction?.channelId);
+      chatSession = ai.chats.create({
+        model: selectedModel,
+        config: {
+          safetySettings: safetySettings,
+          mediaResolution: MediaResolution.MEDIA_RESOLUTION_MEDIUM,
+          maxOutputTokens: 1024,
+          temperature: 0.7,
+          topP: 0.9,
+          topK: 40,
+          tools: [groundingTool],
+          thinkingConfig: {
+            thinkingBudget: -1,
+          },
+          systemInstruction: await SYSTEM_INSTRUCTIONS({ clientDisplayName: client.user.displayName }),
+        },
+        history: [
+          {
+            role: 'user',
+            parts: [{ text: 'Chào Saba! Tôi mới vào server này' }]
+          },
+          {
+            role: 'model',
+            parts: [{ text: 'Yoho..! 🐟 Chào mừng Kaniki mới! Tớ là Saba, cô gái cá chính hiệu sống ở ngọn hải đăng này! Bạn có mang theo vỏ sò nào không? Hay ít nhất là cà phê? 🦀' }]
+          }
+        ]
+      });
+      client.chatSessions.set(interaction?.channelId || 'default', chatSession);
+    }
+
+    const finalResponse = await chatSession.sendMessage({
+      message: contentParts
     });
 
     const responseText = finalResponse.text || 'Sorry, I could not generate a response.';
     return smartSplitMessage(responseText);
   } catch (error) {
-    console.error('Error in chatWithAI:', error);
-    return ['Sorry, there was an error processing your request.'];
+    console.error('❌ Error in chatWithAI:', error);
+    if (error.message?.includes('quota')) {
+      return ['Xin lỗi, hiện tại bot đã hết quota API. Hãy thử lại sau! 🐟'];
+    }
+
+    if (error.message?.includes('safety') || error.message?.includes('SAFETY')) {
+      return ['Yoho..! 🐟 Tớ không thể trả lời câu hỏi này vì lý do an toàn. Hỏi tớ câu khác đi Kaniki!'];
+    }
+
+    if (error.message?.includes('RECITATION')) {
+      return ['Ối! Câu hỏi này có vẻ giống nội dung đã có từ trước. Thử hỏi tớ cách khác đi! 🐟'];
+    }
+
+    return ['Ối! Có lỗi gì đó rồi... 🐟 Thuyền giấy của tớ bị lật mất rồi! Thử lại sau nhé Kaniki!'];
   }
 };

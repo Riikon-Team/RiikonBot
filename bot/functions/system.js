@@ -57,8 +57,8 @@ export const UserInfo = {
                 name: 'userId',
                 type: 'string',
                 description: {
-                    "vi": "Hàm sử dụng để lấy thông tin về người dùng Discord dựa trên ID của họ",
-                    "en": "Function used to retrieve information about a Discord user based on their ID"
+                    "vi": "Hàm sử dụng để lấy thông tin về người dùng Discord dựa trên ID của họ. Nếu trong tin nhắn có `<@userId>`(ví dụ: `<@123456789012345678>`), hãy chỉ lấy ID từ đó để sử dụng.",
+                    "en": "Function used to retrieve information about a Discord user based on their ID. If in a message there is `<@userId>` (e.g., `<@123456789012345678>`), just extract the ID from that to use."
                 },
                 required: true,
             },
@@ -110,7 +110,7 @@ export const UserPresence = {
             if (!guild) return null;
 
             const member = await guild.members.fetch(userId).catch(() => null);
-            if (member && member.presence) {
+            if (member?.presence) {
                 presenceInfo = {
                     status: member.presence.status,
                     activities: member.presence.activities,
@@ -191,7 +191,7 @@ export const EditVoiceChannel = {
             
             // Bitrate validation
             if (bitrate !== undefined && bitrate !== null) {
-                const bitrateNum = parseInt(bitrate);
+                const bitrateNum = Number.parseInt(bitrate);
                 if (Number.isInteger(bitrateNum) && bitrateNum > 0 && bitrateNum <= 384000) {
                     updateData.bitrate = bitrateNum;
                 } else {
@@ -205,7 +205,7 @@ export const EditVoiceChannel = {
             
             // User limit validation
             if (userLimit !== undefined && userLimit !== null) {
-                const userLimitNum = parseInt(userLimit);
+                const userLimitNum = Number.parseInt(userLimit);
                 if (Number.isInteger(userLimitNum) && userLimitNum >= 0 && userLimitNum <= 99) {
                     updateData.userLimit = userLimitNum;
                 } else {

@@ -1,6 +1,6 @@
-import { getGiftcodeAction } from '../actions/game-topics.js';
+import { getGiftcodeAction } from '../actions/game-topics.actions.js';
 
-export default {
+export const GiftcodeCommand = {
     data: {
         name: 'giftcode',
         description: 'Lấy mã giftcode cho game (từ game của Hoyoverse). Mặc định là Honkai: Star Rail.',
@@ -11,3 +11,7 @@ export default {
         await message.reply(reply);
     }
 };
+
+export default [
+    GiftcodeCommand
+];

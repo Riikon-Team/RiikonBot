@@ -7,7 +7,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "deployCommands": "node index.js deployCommands",
+    "start": "node index.js",
+    "encode-cookies": "node scripts/setupCookies.js"
   },
   "repository": {
     "type": "git",
@@ -23,12 +26,20 @@
   "dependencies": {
     "@discordjs/opus": "^0.10.0",
     "@discordjs/voice": "^0.19.0",
+    "@distube/spotify": "^2.0.2",
     "@google/genai": "^1.21.0",
     "@prisma/client": "^6.16.3",
+    "@snazzah/davey": "^0.1.7",
     "axios": "^1.12.2",
     "discord.js": "^14.21.0",
+    "distube": "^5.0.7",
     "dotenv": "^17.2.3",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "ffmpeg-static": "^5.2.0",
+    "genius-lyrics": "^4.4.7",
+    "rikn-music-fetcher": "^1.0.1",
+    "yt-search": "^2.13.1",
+    "ytmusic-api": "^5.3.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { GIFT_CODES } from '../constants/game-topics.js';
 
-const BASE_URL = `https://hoyo-codes.seria.moe/codes`;
+const BASE_URL = "https://hoyo-codes.seria.moe/codes";
 
 export const GiftcodeHoyoverseGame = {
     data: {

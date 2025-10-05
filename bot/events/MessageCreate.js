@@ -3,17 +3,20 @@ import { PREFIX } from '../constants/bot.js';
 import { handleTimeout, formatTimeLeft } from '../utils/timeout.js';
 import { chatWithAI } from '../actions/chat-ai/chat.js';
 import { MAX_CHAT_HISTORY } from '../constants/config.js';
-import { getChannelChatHistory, getAttactmentsFromLastMessage } from '../utils/getChat.js';
+import { getChannelChatHistory, getAttactmentsFromLastMessage } from '../utils/chat.js';
+import { ContextAdapter } from '../contexts/ContextAdapter.js';
+import { iEmbedBuilder } from '../utils/iEmbedBuilder.js';
 
 export default {
     name: Events.MessageCreate,
     async execute(message) {
+// =================================================================================
         // Save History for each channel
         const client = message.client;
         if (message.guild) {
             const chatId = `${message.guild.id}-${message.channel.id}`;
             const history = client.chatHistory.get(chatId) || [];
-            if (history.length == 0) {
+            if (history.length === 0) {
                 const fetched = await getChannelChatHistory(client, message.channel.id);
                 if (fetched.history) {
                     client.chatHistory.set(chatId, fetched.history.reverse());
@@ -52,15 +55,24 @@ export default {
         // Ignore messages from bots or without guild context
         if (message.author.bot || !message.guild) return;
 
+        console.log(`[${message.guild.name} - #${message.channel.name}] ${message.author.tag}: ${message.content}`);
+
         // Tag bot to AI chat
         if (message.mentions.has(message.client.user)) {
             // Convert bot mention to name, orther mentions are not changed
-            const prompt = message.content.replace(new RegExp(`<@!?${message.client.user.id}>`, 'g'), message.client.user.username).trim();
+            const prompt = message.content
+            .replace(new RegExp(`<@!?${message.client.user.id}>`, 'g'), message.client.user.username)
+            .replace(/<@!?(\d+)>/g, (match, userId) => {
+                const user = message.client.users.cache.get(userId);
+                return user ? `@${user.username}` : match;
+            })
+            .trim();
 
             console.log(`AI chat prompt from ${message.author.tag} in #${message.channel.name} of ${message.guild.name}: ${prompt}`);
 
             if (!prompt) return;
 
+// =================================================================================
             // Indicate that the bot is typing
             message.channel.sendTyping();
 
@@ -76,14 +88,14 @@ export default {
                         }
                     });
                 } else {
-                    await message.reply({ content: 'Sorry, I could not generate a response.' });
+                    await message.reply({ content: 'Xin lỗi, tôi không thể trả lời câu hỏi của bạn vào lúc này.' });
                 }
             } catch (error) {
                 console.error('Error during AI chat:', error);
-                await message.reply({ content: 'There was an error processing your request.' });
+                await message.reply({ content: 'Đã xảy ra lỗi khi xử lý yêu cầu của bạn.' });
             }
         }
-
+// =================================================================================
         // Handle prefix commands
         if (message.content.startsWith(PREFIX)) {
             const args = message.content.slice(PREFIX.length).trim().split(/ +/);
@@ -96,16 +108,20 @@ export default {
             if (command.data.cooldown) {
                 const timeLeft = handleTimeout(message.client.timeoutCollection, message.author.id, command.data.cooldown);
                 if (timeLeft?.onCooldown) {
-                    return message.reply({
-                        content: `⏳ Bạn đang trong thời gian chờ! Vui lòng đợi **${formatTimeLeft(timeLeft?.timeLeft)}** trước khi sử dụng lệnh này lại.`,
-                        ephemeral: true
-                    });
+                    const embed = new iEmbedBuilder(message)
+                        .setColor('#ff0000')
+                        .setTitle('⏳ Thời gian chờ')
+                        .setDescription(`Bạn đang trong thời gian chờ! Vui lòng đợi **${formatTimeLeft(timeLeft?.timeLeft)}** trước khi sử dụng lệnh này lại.`);
+                    return message.reply(
+                        { embeds: [embed], ephemeral: true }
+                    );
                 }
             }
 
             // Execute command
             try {
-                await command.execute(message, args);
+                const ctx = new ContextAdapter(message, commandName);
+                await command.execute(ctx, args);
             } catch (error) {
                 console.error(`Error executing prefix command ${commandName}:`, error);
                 await message.reply('There was an error executing that command.');
