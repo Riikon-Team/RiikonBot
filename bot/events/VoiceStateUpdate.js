@@ -16,7 +16,7 @@ export default {
         if (!oldState.channel && newState.channel) {
             const embed = new EmbedBuilder()
                 .setColor('#00ff00')
-                .setDescription(`👋 **<@!${newState.member.id}> vừa vào kênh ${newChannel.name}**`)
+                .setDescription(`👋 **<@!${newState.member.id}> vừa vào kênh <#${newChannel.id}>**`)
 
             newChannel.send({ embeds: [embed] }).catch(console.error);
 
@@ -28,7 +28,7 @@ export default {
         if (oldState.channel && !newState.channel) {
             const embed = new EmbedBuilder()
                 .setColor('#ff0000')
-                .setDescription(`${E.exit} **<@!${oldState.member.id}> đã rời kênh ${oldState.channel.name}**`)
+                .setDescription(`${E.exit} **<@!${oldState.member.id}> đã rời kênh <#${oldChannel.id}>**`)
             oldState.channel.send({ embeds: [embed] }).catch(console.error);
 
             if (player && oldState.channel.id === player.voiceChannel?.id) {
@@ -56,7 +56,7 @@ export default {
 
             const embedOutcome = new EmbedBuilder()
                 .setColor('#00ff00')
-                .setDescription(`👋 **<@!${newState.member.id}> vừa vào kênh ${newChannel.name}**`)
+                .setDescription(`👋 **<@!${newState.member.id}> vừa vào kênh <#${newChannel.id}>**`)
 
             oldChannel.send({ embeds: [embedIncome] }).catch(console.error);
             newChannel.send({ embeds: [embedOutcome] }).catch(console.error);
