@@ -14,7 +14,11 @@ export default {
         const player = client.musicPlayers?.get(guild.id);
 
         if (!oldState.channel && newState.channel) {
-            newChannel.send({ content: `👋_**${newState.member.displayName}** vừa vào kênh **${newChannel.name}**_` }).catch(console.error);
+            const embed = new EmbedBuilder()
+                .setColor('#00ff00')
+                .setDescription(`👋 **<@!${newState.member.id}> vừa vào kênh ${newChannel.name}**`)
+
+            newChannel.send({ embeds: [embed] }).catch(console.error);
 
             if (player && newState.channel.id === player.voiceChannel?.id) {
                 player.resetIdleTimeout();
@@ -22,7 +26,10 @@ export default {
         }
 
         if (oldState.channel && !newState.channel) {
-            oldState.channel.send({ content: `${E.exit} _**${oldState.member.displayName}** đã rời kênh **${oldState.channel.name}**_` }).catch(console.error);
+            const embed = new EmbedBuilder()
+                .setColor('#ff0000')
+                .setDescription(`${E.exit} **<@!${oldState.member.id}> đã rời kênh ${oldState.channel.name}**`)
+            oldState.channel.send({ embeds: [embed] }).catch(console.error);
 
             if (player && oldState.channel.id === player.voiceChannel?.id) {
                 const members = oldState.channel.members.filter(m => !m.user.bot);
@@ -43,8 +50,16 @@ export default {
         }
 
         if (oldState.channel && newState.channel && oldState.channel.id !== newState.channel.id) {
-            oldChannel.send({ content: `👋 _**${oldState.member.displayName}** đã chuyển sang kênh khác rồi!_` }).catch(console.error);
-            newChannel.send({ content: `👋 _**${newState.member.displayName}** vừa vào kênh **${newChannel.name}**_` }).catch(console.error);
+            const embedIncome = new EmbedBuilder()
+                .setColor('#ff0000')
+                .setDescription(`${E.exit} **<@!${oldState.member.id}> đã chuyển sang kênh khác rồi!**`)
+
+            const embedOutcome = new EmbedBuilder()
+                .setColor('#00ff00')
+                .setDescription(`👋 **<@!${newState.member.id}> vừa vào kênh ${newChannel.name}**`)
+
+            oldChannel.send({ embeds: [embedIncome] }).catch(console.error);
+            newChannel.send({ embeds: [embedOutcome] }).catch(console.error);
 
             if (player) {
                 if (oldState.channel.id === player.voiceChannel?.id) {

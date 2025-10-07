@@ -205,6 +205,7 @@ class MusicPlayer {
                 // Kiểm tra playlist
                 if (input.includes('playlist') || input.includes('album')) {
                     const tracks = await this.riknClient.getSongsByPlaylist(input);
+                    console.log('🔍 Resolved playlist tracks:', tracks);
                     return tracks || [];
                 }
                 

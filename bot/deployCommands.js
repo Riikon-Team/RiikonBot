@@ -9,9 +9,6 @@ dotenv.config();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const COMMANDS_DIR = path.join(__dirname, 'commands');
 
-/**
- * Collect all slash commands from bot/commands/*.js
- */
 async function collectCommands() {
     const commands = [];
     
@@ -22,7 +19,6 @@ async function collectCommands() {
         const filePath = path.join(COMMANDS_DIR, file);
         const commandModule = await import(pathToFileURL(filePath).href);
         
-        // Support: export default [cmd1, cmd2] or export const Cmd = {...}
         const cmds = Array.isArray(commandModule.default) 
             ? commandModule.default 
             : Object.values(commandModule).filter(cmd => cmd?.data);
@@ -57,13 +53,25 @@ export async function deployCommands() {
     console.log(`\n🚀 Deploying ${commands.length} commands globally...`);
     
     const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
-    
+
+    let mergedCommands = commands;
+    try {
+        const existing = await rest.get(Routes.applicationCommands(DISCORD_CLIENT_ID));
+        if (Array.isArray(existing) && existing.length > 0) {
+            const existingToKeep = existing.filter(ec => !commands.some(nc => nc.name === ec.name));
+            if (existingToKeep.length > 0) {
+                console.log(`ℹ️ Preserving ${existingToKeep.length} existing command(s) not present in collected commands.`);
+                mergedCommands = [...commands, ...existingToKeep];
+            }
+        }
+    } catch (err) {
+        console.warn('⚠️ Could not fetch existing commands, proceeding with collected commands:', err.message);
+    }
+
     await rest.put(
         Routes.applicationCommands(DISCORD_CLIENT_ID),
-        { body: commands }
+        { body: mergedCommands }
     );
     
     console.log('✅ Deploy complete!\n');
 }
-
-// deploy().catch(console.error);
