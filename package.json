@@ -37,7 +37,7 @@
     "express": "^5.1.0",
     "ffmpeg-static": "^5.2.0",
     "genius-lyrics": "^4.4.7",
-    "rikn-music-fetcher": "^1.0.2",
+    "rikn-music-fetcher": "^1.0.3",
     "yt-search": "^2.13.1",
     "ytmusic-api": "^5.3.0"
   },
