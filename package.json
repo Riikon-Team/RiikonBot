@@ -10,7 +10,7 @@
     "dev": "nodemon index.js",
     "deployCommands": "node index.js deployCommands",
     "start": "node index.js",
-    "encode-cookies": "node scripts/setupCookies.js"
+    "encode-cookies": "node scripts/pack.js"
   },
   "repository": {
     "type": "git",
