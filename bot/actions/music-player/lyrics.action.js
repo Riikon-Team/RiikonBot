@@ -147,7 +147,7 @@ async function showStaticLyrics(ctx, lyrics) {
 async function startSyncedLyrics(ctx, player, lyrics) {
     const { syncedLyrics, trackName, artistName, albumName, duration } = lyrics;
 
-    const parsedLyrics = parseSyncedLyrics(syncedLyrics);
+    const parsedLyrics = parseSyncedLyrics(syncedLyrics.sort((a, b) => a.time - b.time));
 
     if (parsedLyrics.length === 0) {
         return showStaticLyrics(ctx, lyrics);
@@ -168,17 +168,17 @@ async function startSyncedLyrics(ctx, player, lyrics) {
             .setDescription('📡 Đo ping Discord...');
         await ctx.editReply({ embeds: [testEmbed] });
         discordLatency = (Date.now() - pingStart) / 1000; // Convert to seconds
-        console.log(`[Lyrics] Discord latency: ${discordLatency.toFixed(3)}s (${(discordLatency * 1000).toFixed(0)}ms)`);
+        // console.log(`[Lyrics] Discord latency: ${discordLatency.toFixed(3)}s (${(discordLatency * 1000).toFixed(0)}ms)`);
     } catch (error) {
-        console.error('[Lyrics] Failed to measure latency:', error);
+        // console.error('[Lyrics] Failed to measure latency:', error);
         discordLatency = 0.2;
     }
 
     // Total offset = base offset + Discord latency
     const EARLY_DISPLAY_OFFSET = DELAY + discordLatency;
-    console.log(`[Lyrics] Total early display offset: ${EARLY_DISPLAY_OFFSET.toFixed(3)}s`);
+    // console.log(`[Lyrics] Total early display offset: ${EARLY_DISPLAY_OFFSET.toFixed(3)}s`);
 
-    console.log(`[Lyrics] Starting sync with ${parsedLyrics.length} lines`);
+    // console.log(`[Lyrics] Starting sync with ${parsedLyrics.length} lines`);
 
 
 
@@ -186,7 +186,7 @@ async function startSyncedLyrics(ctx, player, lyrics) {
         try {
 
             if (!player || player.paused || player.audioPlayer.state.status !== 'playing') {
-                console.log('[Lyrics] Player stopped/paused, ending sync');
+                // console.log('[Lyrics] Player stopped/paused, ending sync');
                 clearInterval(checkInterval);
                 return;
             }
@@ -196,7 +196,7 @@ async function startSyncedLyrics(ctx, player, lyrics) {
 
 
             if (Date.now() - startTime > MAX_EDIT_DURATION) {
-                console.log('[Lyrics] Max edit duration reached');
+                // console.log('[Lyrics] Max edit duration reached');
                 clearInterval(checkInterval);
                 return;
             }
@@ -217,7 +217,7 @@ async function startSyncedLyrics(ctx, player, lyrics) {
             }
 
             if (currentLineIndex >= parsedLyrics.length - 1 && currentTime >= parsedLyrics[parsedLyrics.length - 1].time + 5) {
-                console.log('[Lyrics] Song ended');
+                //  console.log('[Lyrics] Song ended');
                 clearInterval(checkInterval);
             }
 
