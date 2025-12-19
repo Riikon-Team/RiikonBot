@@ -1,5 +1,5 @@
 import { iEmbedBuilder } from '../utils/iEmbedBuilder.js';
-import { PROJECT_INFO } from '../constants/bot.js';
+import { PROJECT_INFO, E } from '../constants/bot.js';
 import { ReplyBuilder } from '../utils/replyBuilder.js';
 
 // Ping command
@@ -115,6 +115,84 @@ export const getProfileAction = async (ctx, { user }) => {
         return ctx.reply({ embeds: [ReplyBuilder.error('Lỗi', 'Đã có lỗi xảy ra khi thực hiện lệnh.')] });
     }
 };
+// Get voice channel users
+export const getVoiceUsersAction = async (ctx) => {
+    const { member, guild } = ctx;
+
+    try {
+        // Get the voice channel the user is in
+        const voiceChannel = member?.voice?.channel;
+
+        if (!voiceChannel) {
+            const embed = new iEmbedBuilder(ctx)
+                .setColor('#ff0000')
+                .setTitle(`${E.error} Lỗi`)
+                .setDescription('Bạn cần vào một kênh voice để sử dụng lệnh này!');
+
+            return ctx.reply({ embeds: [embed] });
+        }
+
+        // Get all members in the voice channel
+        const members = voiceChannel.members;
+
+        if (members.size === 0) {
+            const embed = new iEmbedBuilder(ctx)
+                .setColor('#ff9900')
+                .setTitle(`${E.warning} Thông báo`)
+                .setDescription(`Không có ai trong kênh voice **${voiceChannel.name}**`);
+
+            return ctx.reply({ embeds: [embed] });
+        }
+
+        // Build user list with display name and highest role
+        let userList = '';
+        const userArray = [];
+
+        for (const [memberId, voiceMember] of members) {
+            try {
+                // Get member from guild to access roles
+                const guildMember = await guild.members.fetch(memberId);
+
+                // Get highest role (excluding @everyone)
+                const highestRole = guildMember.roles.highest.name !== '@everyone'
+                    ? guildMember.roles.highest.name
+                    : 'Không có role';
+
+                const displayName = guildMember.displayName || guildMember.user.username;
+                const formattedName = `[${highestRole}] ${displayName}`;
+
+                userArray.push({
+                    name: formattedName,
+                    displayName,
+                    tag: guildMember.user.tag,
+                    role: highestRole
+                });
+
+                userList += `• **${formattedName}** (@${guildMember.user.tag})\n`;
+            } catch (error) {
+                console.error(`Error fetching member ${memberId}:`, error);
+            }
+        }
+
+        // Create embed
+        const embed = new iEmbedBuilder(ctx)
+            .setColor('#0099ff')
+            .setTitle(`👥 Danh sách người dùng trong voice`)
+            .setDescription(
+                `**Kênh:** ${voiceChannel.name}\n` +
+                `**Số người:** ${members.size}\n\n` +
+                `${userList}`
+            )
+            .setFooter({ text: `Format: [Role cao nhất] Tên hiển thị` })
+            .setTimestamp();
+
+        return ctx.reply({ embeds: [embed] });
+    } catch (error) {
+        console.error('Get voice users error:', error);
+        return ctx.reply({ embeds: [ReplyBuilder.error('Lỗi', 'Đã có lỗi xảy ra khi thực hiện lệnh.')] });
+    }
+};
+
 // Get help command
 export const helpAction = async (ctx, { helpDocs, type = 'slash', page = 1 }) => {
     // Validate input

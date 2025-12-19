@@ -92,6 +92,9 @@ const startBot = async () => {
     client.musicPlayers = new Map();
     client.musicSearchResults = new Map();
 
+    // Create Attendance Sessions map
+    client.attendanceSessions = new Map();
+
     // Login to Discord with your client's token
     await client.login(DISCORD_TOKEN);
 

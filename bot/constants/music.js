@@ -6,11 +6,11 @@ export const MAX_PLAYLIST_SIZE = 100;
 export const SEARCH_RESULTS_LIMIT = 20;
 
 // Voice connection timeouts
-export const VOICE_IDLE_TIMEOUT = 60000; // 1 minute
-export const VOICE_RECONNECT_TIMEOUT = 30000; // 30 seconds
+export const VOICE_IDLE_TIMEOUT = 300000; // 5 minutes
+export const VOICE_RECONNECT_TIMEOUT = 60000; // 1 minute
 
 // Stream settings
-export const STREAM_BITRATE = 128;
+export const STREAM_BITRATE = 192;
 export const STREAM_TYPE = 'opus';
 export const FFMPEG_ARGS = [
     '-analyzeduration', '0',
@@ -31,12 +31,12 @@ export const PLATFORM_EMOJIS = {
 // Status emojis
 export const STATUS_EMOJIS = {
     playing: '▶',
-    paused:  '⏸',
+    paused: '⏸',
     stopped: '⏹',
     loading: E["5456bocchioverload"],
     error: E.error,
     success: E.success,
-    queue:  E.KittyPaw17,
+    queue: E.KittyPaw17,
     loop: E.loop,
     shuffle: '🔀',
     volume: '🔊'

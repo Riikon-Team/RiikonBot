@@ -1,10 +1,11 @@
-import { 
+import {
     pingAction,
     getAvatarAction,
     getProfileAction,
     helpAction,
     getGuildInfoAction,
-    getAboutMeAction
+    getAboutMeAction,
+    getVoiceUsersAction
 } from '../actions/system.actions.js';
 import { SlashCommandBuilder } from 'discord.js';
 
@@ -22,7 +23,7 @@ export const GetAvatarCommand = {
     data: new SlashCommandBuilder()
         .setName('avatar')
         .setDescription('Replies with the avatar of the user or mentioned user.')
-        .addUserOption(option => 
+        .addUserOption(option =>
             option.setName('user')
                 .setDescription('The user to get the avatar of')
                 .setRequired(false)),
@@ -37,7 +38,7 @@ export const GetProfileCommand = {
     data: new SlashCommandBuilder()
         .setName('profile')
         .setDescription('Xem thông tin cá nhân của bạn hoặc người khác')
-        .addUserOption(option => 
+        .addUserOption(option =>
             option.setName('user')
                 .setDescription('Người dùng để xem thông tin')
                 .setRequired(false)),
@@ -52,7 +53,7 @@ export const HelpCommand = {
     data: new SlashCommandBuilder()
         .setName('help')
         .setDescription('Hiện thị danh sách lệnh có thể sử dụng')
-        .addStringOption(option => 
+        .addStringOption(option =>
             option.setName('type')
                 .setDescription('Loại lệnh: prefix hoặc slash')
                 .setRequired(false)
@@ -60,7 +61,7 @@ export const HelpCommand = {
                     { name: 'prefix', value: 'prefix' },
                     { name: 'slash', value: 'slash' }
                 ))
-        .addIntegerOption(option => 
+        .addIntegerOption(option =>
             option.setName('page')
                 .setDescription('Số trang')
                 .setRequired(false)),
@@ -96,11 +97,22 @@ export const GetAboutMeCommand = {
     }
 };
 
+export const GetVoiceUsersCommand = {
+    data: new SlashCommandBuilder()
+        .setName('voiceusers')
+        .setDescription('Lấy danh sách người dùng trong kênh voice'),
+    cooldown: 5000,
+    async execute(ctx) {
+        return await getVoiceUsersAction(ctx);
+    }
+};
+
 export default [
     PingCommand,
     GetAvatarCommand,
     GetProfileCommand,
     HelpCommand,
     GetGuildInfoCommand,
-    GetAboutMeCommand
+    GetAboutMeCommand,
+    GetVoiceUsersCommand
 ];

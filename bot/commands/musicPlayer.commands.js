@@ -28,15 +28,15 @@ export const PlayCommand = {
             option.setName('add_first')
                 .setDescription('Thêm vào đầu hàng đợi')
                 .setRequired(false)),
-    
+
     cooldown: 3000,
-    
+
     async execute(ctx) {
         await ctx.defer();
 
         const query = ctx.getOption('query');
         const addFirst = ctx.getOption('add_first', 'boolean') || false;
-        
+
         return await playAction(ctx, { query, addFirst });
     }
 };
@@ -45,9 +45,9 @@ export const PauseCommand = {
     data: new SlashCommandBuilder()
         .setName('pause')
         .setDescription('Tạm dừng bài hát đang phát'),
-    
+
     cooldown: 2000,
-    
+
     async execute(ctx) {
         return await pauseAction(ctx);
     }
@@ -57,7 +57,7 @@ export const ResumeCommand = {
     data: new SlashCommandBuilder()
         .setName('resume')
         .setDescription('Tiếp tục phát nhạc'),
-    
+
     cooldown: 2000,
 
     async execute(ctx) {
@@ -75,12 +75,12 @@ export const SkipCommand = {
                 .setRequired(false)
                 .setMinValue(1)
                 .setMaxValue(10)),
-    
+
     cooldown: 2000,
 
     async execute(ctx) {
         const count = ctx.getOption('count', 'integer') || 1;
-        
+
         return await skipAction(ctx, { count });
     }
 };
@@ -95,14 +95,14 @@ export const PreviousCommand = {
                 .setRequired(false)
                 .setMinValue(1)
                 .setMaxValue(10)),
-    
+
     cooldown: 2000,
 
     async execute(ctx) {
         await ctx.defer();
-        
+
         const count = ctx.getOption('count', 'integer') || 1;
-        
+
         return await previousAction(ctx, { count });
     }
 };
@@ -116,14 +116,14 @@ export const QueueCommand = {
                 .setDescription('Số trang')
                 .setRequired(false)
                 .setMinValue(1)),
-    
+
     cooldown: 2000,
-    
+
     async execute(ctx) {
         await ctx.defer();
-        
+
         const page = ctx.getOption('page', 'integer') || 1;
-        
+
         return await queueAction(ctx, { page });
     }
 };
@@ -132,9 +132,9 @@ export const NowPlayingCommand = {
     data: new SlashCommandBuilder()
         .setName('nowplaying')
         .setDescription('Xem bài hát đang phát'),
-    
+
     cooldown: 2000,
-    
+
     async execute(ctx) {
         return await nowPlayingAction(ctx);
     }
@@ -148,12 +148,12 @@ export const SearchCommand = {
             option.setName('query')
                 .setDescription('Từ khóa tìm kiếm')
                 .setRequired(true)),
-    
+
     cooldown: 3000,
 
     async execute(ctx) {
         const query = ctx.getOption('query');
-        
+
         return await searchAction(ctx, { query });
     }
 };
@@ -162,12 +162,12 @@ export const JoinCommand = {
     data: new SlashCommandBuilder()
         .setName('join')
         .setDescription('Tham gia kênh voice'),
-    
+
     cooldown: 3000,
-    
+
     async execute(ctx) {
         await ctx.defer();
-        
+
         return await joinAction(ctx);
     }
 };
@@ -176,12 +176,12 @@ export const LeaveCommand = {
     data: new SlashCommandBuilder()
         .setName('leave')
         .setDescription('Rời khỏi kênh voice và xóa hàng đợi'),
-    
+
     cooldown: 3000,
-    
+
     async execute(ctx) {
         await ctx.defer();
-        
+
         return await leaveAction(ctx);
     }
 };
@@ -196,12 +196,12 @@ export const VolumeCommand = {
                 .setRequired(false)
                 .setMinValue(1)
                 .setMaxValue(100)),
-    
+
     cooldown: 2000,
-    
+
     async execute(ctx) {
         const volume = ctx.getOption('level', 'integer');
-        
+
         return await volumeAction(ctx, { volume });
     }
 };
@@ -210,7 +210,7 @@ export const LoopCommand = {
     data: new SlashCommandBuilder()
         .setName('loop')
         .setDescription('Bật/tắt chế độ lặp lại'),
-    
+
     cooldown: 2000,
 
     async execute(ctx) {
@@ -222,7 +222,7 @@ export const ShuffleCommand = {
     data: new SlashCommandBuilder()
         .setName('shuffle')
         .setDescription('Xáo trộn hàng đợi'),
-    
+
     cooldown: 3000,
 
     async execute(ctx) {
@@ -239,14 +239,14 @@ export const RemoveCommand = {
                 .setDescription('Vị trí bài hát cần xóa')
                 .setRequired(true)
                 .setMinValue(1)),
-    
+
     cooldown: 2000,
 
     async execute(ctx) {
         await ctx.defer();
-        
+
         const position = ctx.getOption('position', 'integer');
-        
+
         return await removeAction(ctx, { position });
     }
 };
@@ -258,14 +258,19 @@ export const LyricsCommand = {
         .addStringOption(option =>
             option.setName('query')
                 .setDescription('Tên bài - Tên nghệ sĩ (để trống để lấy bài đang phát)')
+                .setRequired(false))
+        .addBooleanOption(option =>
+            option.setName('sync')
+                .setDescription('Đồng bộ lyrics theo thời gian (chỉ khi đang phát nhạc)')
                 .setRequired(false)),
-    
+
     cooldown: 3000,
 
     async execute(ctx) {
         const query = ctx.getOption('query') || '';
-        
-        return await lyricsAction(ctx, { query });
+        const sync = ctx.getOption('sync', 'boolean') || false;
+
+        return await lyricsAction(ctx, { query, sync });
     }
 };
 

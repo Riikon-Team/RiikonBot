@@ -33,17 +33,17 @@ class MusicPlayer {
         // Queue system
         this.queue = [];
         this.currentTrack = null;
-        
+
         // Player state
         this.volume = DEFAULT_VOLUME;
         this.loop = false;
         this.paused = false;
-        
+
         // Timing
         this.startTime = null;
         this.pausedTime = 0;
         this.pausedAt = null;
-        
+
         // Idle timeout
         this.idleTimeout = null;
 
@@ -138,7 +138,7 @@ class MusicPlayer {
 
     disconnect() {
         this.clearIdleTimeout();
-        
+
         if (this.connection && this.connection.state.status !== 'destroyed') {
             try {
                 this.connection.destroy();
@@ -150,17 +150,17 @@ class MusicPlayer {
     }
 
     // ==================== QUEUE MANAGEMENT ====================
-    
+
     async addTracks(input, requestedBy) {
         const tracks = await this.resolveInput(input);
         console.log('🔍 Resolved tracks:', tracks);
-        
+
         if (!tracks || tracks.length === 0) {
             throw new Error('Không tìm thấy bài hát nào');
         }
 
         const addedTracks = [];
-        
+
         for (const track of tracks) {
             track.requestedBy = requestedBy;
             track.addedAt = Date.now();
@@ -176,14 +176,14 @@ class MusicPlayer {
 
     async addTracksFirst(input, requestedBy) {
         const tracks = await this.resolveInput(input);
-        
+
         if (!tracks || tracks.length === 0) {
             throw new Error('Không tìm thấy bài hát nào');
         }
 
         const addedTracks = [];
         const insertPosition = this.currentTrack ? 1 : 0;
-        
+
         for (let i = tracks.length - 1; i >= 0; i--) {
             const track = tracks[i];
             track.requestedBy = requestedBy;
@@ -208,12 +208,12 @@ class MusicPlayer {
                     console.log('🔍 Resolved playlist tracks:', tracks);
                     return tracks || [];
                 }
-                
+
                 // Single track
                 const track = await this.riknClient.getSongByUrl(input, false);
                 return track ? [track] : [];
             }
-            
+
             // Search query
             const tracks = await this.riknClient.searchSong(input, 'youtube');
             return tracks && tracks.length > 0 ? [tracks[0]] : [];
@@ -232,7 +232,7 @@ class MusicPlayer {
         }
 
         const track = this.queue[0];
-        
+
         try {
             // Connect trước khi stream
             if (!this.connection || this.connection.state.status === 'destroyed') {
@@ -244,10 +244,10 @@ class MusicPlayer {
             }
 
             console.log(`🎵 Playing: ${track.title} - ${track.artist}`);
-            
+
             // Lấy stream từ RiknClient
             const stream = await this.riknClient.streamSongByUrl(track.url);
-            
+
             const resource = createAudioResource(stream, {
                 inputType: StreamType.Arbitrary,
                 inlineVolume: true
@@ -257,7 +257,7 @@ class MusicPlayer {
             if (resource.volume) {
                 resource.volume.setVolume(this.volume / 100);
             }
-            
+
             this.resource = resource;
             this.audioPlayer.play(resource);
             this.currentTrack = track;
@@ -293,7 +293,7 @@ class MusicPlayer {
 
     async skip(count = 1) {
         if (count < 1) return false;
-        
+
         // Nếu chỉ còn 1 bài hoặc skip nhiều hơn số bài còn lại
         if (count >= this.queue.length) {
             // Stop và clear queue
@@ -301,12 +301,12 @@ class MusicPlayer {
             this.queue = [];
             return true;
         }
-        
+
         // Skip n-1 bài, bài thứ n sẽ được phát
         for (let i = 0; i < count - 1; i++) {
             this.queue.shift();
         }
-        
+
         // Stop bài hiện tại, handleTrackEnd sẽ phát bài tiếp
         this.audioPlayer.stop();
         return true;
@@ -338,7 +338,7 @@ class MusicPlayer {
 
         if (this.queue.length > 0) {
             const nextTrack = await this.play();
-            
+
             // Send notification about next track
             if (nextTrack && this.textChannel) {
                 const embed = new EmbedBuilder()
@@ -377,16 +377,16 @@ class MusicPlayer {
         } else {
             // Hết hàng đợi
             this.currentTrack = null;
-            
+
             if (this.textChannel) {
                 const embed = new EmbedBuilder()
                     .setColor('#ff9900')
                     .setTitle('Hết hàng chờ')
                     .setDescription('Không còn bài hát nào trong hàng đợi!');
-                
+
                 this.textChannel.send({ embeds: [embed] }).catch(console.error);
             }
-            
+
             this.startIdleTimeout();
         }
     }
@@ -434,7 +434,7 @@ class MusicPlayer {
     clearQueue() {
         const currentTrack = this.currentTrack;
         const cleared = this.queue.length;
-        
+
         if (currentTrack) {
             this.queue = [currentTrack];
         } else {
@@ -448,16 +448,16 @@ class MusicPlayer {
 
     startIdleTimeout() {
         this.clearIdleTimeout();
-        
+
         this.idleTimeout = setTimeout(() => {
             this.disconnect();
-            
+
             const embed = new EmbedBuilder()
                 .setColor('#ff0000')
                 .setTitle(`${E.exit} Đã rời kênh voice`)
                 .setDescription('Bot đã rời khỏi kênh voice do không hoạt động trong 1 phút');
-            
-            this.textChannel?.send({ embeds: [embed] }).catch(() => {});
+
+            this.textChannel?.send({ embeds: [embed] }).catch(() => { });
         }, VOICE_IDLE_TIMEOUT);
     }
 
@@ -489,11 +489,11 @@ class MusicPlayer {
 
     getCurrentTime() {
         if (!this.startTime) return 0;
-        
+
         if (this.paused && this.pausedAt) {
             return (this.pausedAt - this.startTime - this.pausedTime) / 1000;
         }
-        
+
         return (Date.now() - this.startTime - this.pausedTime) / 1000;
     }
 
@@ -509,13 +509,13 @@ class MusicPlayer {
 
     handleError(error) {
         console.error('Music player error:', error);
-        
+
         const embed = new EmbedBuilder()
             .setColor('#ff0000')
             .setTitle(`${E.error} Lỗi phát nhạc`)
             .setDescription(`\`\`\`${error.message}\`\`\``);
-        
-        this.textChannel?.send({ embeds: [embed] }).catch(() => {});
+
+        this.textChannel?.send({ embeds: [embed] }).catch(() => { });
     }
 
     cleanup() {
@@ -525,11 +525,11 @@ class MusicPlayer {
 
     formatDuration(seconds) {
         if (!seconds || Number.isNaN(seconds)) return '0:00';
-        
+
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
         const secs = Math.floor(seconds % 60);
-        
+
         if (hours > 0) {
             return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }

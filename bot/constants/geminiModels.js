@@ -1,17 +1,10 @@
 
 export const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-export const GEMINI_2_5_PRO = 'gemini-2.5-pro';
-export const GEMINI_2_5_FLASH = 'gemini-2.5-flash';
-// export const GEMINI_2_5_IMAGE = 'gemini-2.5-flash-image-preview';
-export const GEMINI_2_5_IMAGE = 'gemini-2.0-flash-preview-image-generation';
-export const GEMINI_2_5_LITE = 'gemini-2.5-flash-lite-preview-09-2025';
-export const GEMINI_3 = 'gemini-3-pro-preview';
-
 export const GEMINI_MODELS = {
-    GEMINI_2_5_FLASH: {
-        id: GEMINI_2_5_FLASH,
-        description: "A fast and capable model suitable for a wide range of tasks, including text generation, summarization, and more.",
+    GEMINI_FLASH_LASTEST: {
+        id: 'gemini-flash-latest',
+        description: "A fast and capable model suitable for a wide range of tasks, including text generation, summarization, and more. (memory 2024)",
         capabilities: [
             "Text Generation",
             "Summarization",
@@ -25,9 +18,24 @@ export const GEMINI_MODELS = {
             "Limited context window compared to larger models"
         ]
     },
-    GEMINI_3: {
-        id: GEMINI_3,
-        description: "A model optimized for image-related tasks, including image generation, captioning, and understanding visual content. It works well for applications that require multimodal capabilities, and thinking so amazing. Recommended!!!",
+
+    GEMINI_FLASH_LITE_LASTEST: {
+        id: 'gemini-flash-latest',
+        description: "A balanced model that offers a good trade-off between performance and speed, suitable for a variety of applications. (memory 2024)",
+        capabilities: [
+            "Text Generation",
+            "Conversational AI",
+            "Content Creation",
+            "Thinking"
+        ],
+        limitations: [
+            "May not be as fast as GEMINI_2_5_FLASH for certain tasks",
+            "Limited context window compared to larger models"
+        ]
+    },
+    GEMINI_3_PRO: {
+        id: 'gemini-3-pro-preview',
+        description: "A model optimized for image-related tasks, including image generation, captioning, and understanding visual content. It works well for applications that require multimodal capabilities, and thinking so amazing. Recommended!!! (memory 2025)",
         capabilities: [
             "Visual Content Analysis",
             "Multimodal Understanding",
@@ -41,18 +49,20 @@ export const GEMINI_MODELS = {
             "May have limitations in understanding complex visual scenes"
         ]
     },
-    GEMINI_2_5_LITE: {
-        id: GEMINI_2_5_LITE,
-        description: "A balanced model that offers a good trade-off between performance and speed, suitable for a variety of applications.",
+    GEMINI_3_FLASH: {
+        id: 'gemini-3-flash-preview',
+        description: "A model optimized for image-related tasks, including image generation, captioning, and understanding visual content. It works well for applications that require multimodal capabilities, and thinking so amazing. Recommended!!! (memory 2025)",
         capabilities: [
-            "Text Generation",
-            "Conversational AI",
-            "Content Creation",
-            "Thinking"
+            "Visual Content Analysis",
+            "Multimodal Understanding",
+            "Captioning",
+            "Thinking",
+            "Code Generation (so amazing!)",
+            "Research"
         ],
         limitations: [
-            "May not be as fast as GEMINI_2_5_FLASH for certain tasks",
-            "Limited context window compared to larger models"
+            "Not suitable for text-only tasks",
+            "May have limitations in understanding complex visual scenes"
         ]
-    }
+    },
 }

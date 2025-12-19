@@ -12,6 +12,7 @@ import { GEMINI_API_KEY, GEMINI_MODELS } from '../../constants/geminiModels.js';
 import sysFunc from '../../functions/system.js';
 import gameTopicFunc from '../../functions/game-topics.js';
 import chatFunc from '../../functions/chat.js';
+import musicFunc from '../../functions/music.js';
 import { smartSplitMessage } from '../../utils/splitChat.js';
 import { downloadImageAsBase64 } from '../../utils/downloadImage.js';
 import { SYSTEM_INSTRUCTIONS } from '../../constants/ai.js';
@@ -43,13 +44,16 @@ const funcs = {
   ...chatFunc,
   ...sysFunc,
   ...gameTopicFunc,
+  ...musicFunc,
 };
+
+const randomModel = Object.values(GEMINI_MODELS)[Math.floor(Math.random() * Object.values(GEMINI_MODELS).length)].id;
 
 const analysePrompt = async (
   client,
   interaction,
   prompt,
-  model = GEMINI_MODELS.GEMINI_2_5_LITE.id,
+  model = randomModel,
 ) => {
   try {
     const response = await ai.models.generateContent({
@@ -135,7 +139,7 @@ Note:
         } catch (error) {
           console.error('Error parsing JSON:', error);
           return {
-            model: "gemini-2.5-flash",
+            model: randomModel,
             functions: [],
             needLastAttachment: false
           };

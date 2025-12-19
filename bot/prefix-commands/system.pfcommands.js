@@ -4,7 +4,8 @@ import {
     getProfileAction,
     helpAction,
     getAvatarAction,
-    getGuildInfoAction
+    getGuildInfoAction,
+    getVoiceUsersAction
 } from '../actions/system.actions.js';
 
 export const AboutCommand = {
@@ -96,11 +97,26 @@ export const GuildCommand = {
     }
 };
 
+export const VoiceUsersCommand = {
+    data: {
+        name: 'voiceusers',
+        description: 'Lấy danh sách người dùng trong kênh voice',
+        cooldown: 5000,
+        usage: 'voiceusers',
+        aliases: ['vu']
+    },
+    async execute(ctx, args) {
+        return getVoiceUsersAction(ctx);
+    }
+};
+
 
 export default [
     AboutCommand,
     PingCommand,
     ProfileCommand,
     HelpCommand,
-    AvatarCommand
+    AvatarCommand,
+    GuildCommand,
+    VoiceUsersCommand
 ];

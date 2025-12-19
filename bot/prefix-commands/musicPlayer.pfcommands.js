@@ -205,7 +205,7 @@ export const VolumePrefixCommand = {
 
         // Validate volume
         if (args.length > 0 && (Number.isNaN(volume) || volume < 1 || volume > 100)) {
-            volume = undefined; 
+            volume = undefined;
         }
 
         return await volumeAction(ctx, { volume });
@@ -267,16 +267,22 @@ export const LyricsPrefixCommand = {
         name: 'lyrics',
         aliases: ['ly', 'lyric'],
         description: 'Lấy lời bài hát',
-        usage: 'lyrics [tên bài - tên nghệ sĩ]',
+        usage: 'lyrics [tên bài - tên nghệ sĩ] [--sync]',
         category: 'Music',
         cooldown: 3000,
     },
 
     async execute(message, args) {
         const ctx = new ContextAdapter(message, 'lyrics');
-        const query = args.join(' ');
 
-        return await lyricsAction(ctx, { query });
+        // Check for --sync flag
+        const sync = args.includes('--sync') || args.includes('-s');
+
+        // Remove sync flags from args
+        const queryArgs = args.filter(arg => arg !== '--sync' && arg !== '-s');
+        const query = queryArgs.join(' ');
+
+        return await lyricsAction(ctx, { query, sync });
     }
 };
 
