@@ -24,12 +24,14 @@ export const nowPlayingAction = async (ctx) => {
 
     const queueInfo = player.getQueue();
 
+    const artist = song.artist || (typeof song.artists === 'string' ? song.artists : 'Unknown');
+
     const embed = new iEmbedBuilder(ctx)
         .setColor('#0099ff')
         .setTitle(player.paused ? `${E.Pause} Đã tạm dừng` : `${E.Resume} Đang phát`)
         .setDescription(`**[${song.title}](${song.url})**`)
         .addFields(
-            { name: 'Nghệ sĩ', value: song.artist || 'Unknown', inline: true },
+            { name: 'Nghệ sĩ', value: artist, inline: true },
             { name: 'Album', value: song.album || 'Unknown', inline: true },
             { name: 'Thời lượng', value: player.formatDuration(duration), inline: true },
             {
@@ -49,9 +51,10 @@ export const nowPlayingAction = async (ctx) => {
 
     if (queueInfo.upcoming && queueInfo.upcoming.length > 0) {
         const nextSong = queueInfo.upcoming[0];
+        const artist = nextSong.artist || (typeof nextSong.artists === 'string' ? nextSong.artists : 'Unknown');
         embed.addFields({
             name: '⏭ Tiếp theo',
-            value: `**${nextSong.title}** - ${nextSong.artist}`,
+            value: `**${nextSong.title}** - ${artist}`,
             inline: false
         });
     }

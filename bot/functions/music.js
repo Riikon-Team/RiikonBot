@@ -261,11 +261,12 @@ export const MusicNowPlaying = {
             const player = client.musicPlayers?.get(interaction.guild.id);
             if (player) {
                 const track = player.getCurrentTrack();
+                const artist = track ? (track.artist || (typeof track.artists === 'string' ? track.artists : 'Unknown')) : 'Unknown';
                 return {
                     success: true,
                     currentTrack: track ? {
                         title: track.title,
-                        artist: track.artist,
+                        artist: artist,
                         duration: track.duration,
                         url: track.url,
                         platform: track.platform

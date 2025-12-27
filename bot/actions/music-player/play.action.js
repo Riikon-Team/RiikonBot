@@ -54,13 +54,13 @@ export const playAction = async (ctx, {query, addFirst=false} ) => {
 
         if (!wasPlaying) {
             const track = await player.play();
-
+            const artist = track.artist || (typeof track.artists === 'string' ? track.artists : 'Unknown');
             const playEmbed = new iEmbedBuilder(ctx)
                 .setColor('#00ff00')
                 .setTitle(`${E["21362bocchitherock"]} Bắt đầu phát`)
                 .setDescription(`**[${track.title}](${track.url})**`)
                 .addFields(
-                    { name: 'Nghệ sĩ', value: track.artist || 'Unknown', inline: true },
+                    { name: 'Nghệ sĩ', value: artist, inline: true },
                     { name: 'Thời lượng', value: player.formatDuration(track.duration), inline: true },
                     { name: 'Nền tảng', value: E[track.platform.toLowerCase()], inline: true }
                 )
@@ -88,8 +88,9 @@ export const playAction = async (ctx, {query, addFirst=false} ) => {
                 .setFooter({ text: addFirst ? 'Đã thêm lên đầu hàng đợi' : 'Đã thêm vào cuối hàng đợi' });
 
             if (!result.isPlaylist && result.tracks[0]) {
+                const artist = result.tracks[0].artist || (typeof result.tracks[0].artists === 'string' ? result.tracks[0].artists : 'Unknown');
                 addedEmbed.addFields(
-                    { name: 'Nghệ sĩ', value: result.tracks[0].artist || 'Unknown', inline: true },
+                    { name: 'Nghệ sĩ', value: artist, inline: true },
                     { name: 'Thời lượng', value: player.formatDuration(result.tracks[0].duration), inline: true }
                 );
                 addedEmbed.setThumbnail(result.tracks[0].thumbnail);

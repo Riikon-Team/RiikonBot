@@ -3,7 +3,7 @@ import { E } from '../../constants/bot.js';
 
 const MAX_EDIT_DURATION = 10 * 60 * 1000;
 const CHECK_INTERVAL = 100;
-const DELAY = 1.500;
+const DELAY = 0.500;
 
 
 export const lyricsAction = async (ctx, { query, sync = false }) => {
@@ -48,7 +48,7 @@ export const lyricsAction = async (ctx, { query, sync = false }) => {
         }
 
         trackName = currentTrack.title;
-        artistName = currentTrack.artist;
+        artistName = currentTrack.artist || (typeof currentTrack.artists === 'string' ? currentTrack.artists : "Unknown");
         albumName = currentTrack.album;
         duration = currentTrack.duration;
         isCurrentTrack = true;
@@ -167,20 +167,13 @@ async function startSyncedLyrics(ctx, player, lyrics) {
             .setTitle(`${E.VinylRecord} ${trackName} (🎵 Live)`)
             .setDescription('📡 Đo ping Discord...');
         await ctx.editReply({ embeds: [testEmbed] });
-        discordLatency = (Date.now() - pingStart) / 1000; // Convert to seconds
-        // console.log(`[Lyrics] Discord latency: ${discordLatency.toFixed(3)}s (${(discordLatency * 1000).toFixed(0)}ms)`);
+        discordLatency = (Date.now() - pingStart) / 1000; 
     } catch (error) {
-        // console.error('[Lyrics] Failed to measure latency:', error);
         discordLatency = 0.2;
     }
 
     // Total offset = base offset + Discord latency
     const EARLY_DISPLAY_OFFSET = DELAY + discordLatency;
-    // console.log(`[Lyrics] Total early display offset: ${EARLY_DISPLAY_OFFSET.toFixed(3)}s`);
-
-    // console.log(`[Lyrics] Starting sync with ${parsedLyrics.length} lines`);
-
-
 
     const checkAndUpdate = async () => {
         try {
@@ -369,11 +362,6 @@ function parseSyncedLyrics(syncedLyrics) {
     }
 
     const sorted = parsed.sort((a, b) => a.time - b.time);
-
-
-    if (sorted.length > 0) {
-        console.log(`[Lyrics] Parsed ${sorted.length} lines.First 3: `, sorted.slice(0, 3).map(l => `${l.time.toFixed(2)}s: ${l.text.substring(0, 30)}`));
-    }
 
     return sorted;
 }

@@ -50,9 +50,10 @@ export const queueAction = async (ctx, { page }) => {
         const emoji = isCurrent ? E.MusicBeat : `\`${position}.\``;
         const duration = player.formatDuration(song.duration);
         const requester = song.requestedBy?.user?.tag || 'Unknown';
+        const artist = song.artist || (typeof song.artists === 'string' ? song.artists : 'Unknown');
 
         queueDescription += `${emoji} **${song.title}**\n`;
-        queueDescription += `   ${player.getPlatformEmoji(song.platform)} ${song.artist} • ${duration} • ${requester}\n\n`;
+        queueDescription += `   ${player.getPlatformEmoji(song.platform)} ${artist} • ${duration} • ${requester}\n\n`;
     });
 
     const currentSong = queueInfo.current;
@@ -65,9 +66,10 @@ export const queueAction = async (ctx, { page }) => {
         .setFooter({ text: `Trang ${page}/${totalPages || 1} • Sử dụng "queue <số>" để xem trang khác` });
 
     if (currentSong) {
+        const artist = currentSong.artist || (typeof currentSong.artists === 'string' ? currentSong.artists : 'Unknown');
         embed.addFields({
             name: `${E.MusicBeat} Đang phát`,
-            value: `**${currentSong.title}** - ${currentSong.artist}\n${player.getPlatformEmoji(currentSong.platform)} ${player.formatDuration(currentSong.duration)}`,
+            value: `**${currentSong.title}** - ${artist}\n${player.getPlatformEmoji(currentSong.platform)} ${player.formatDuration(currentSong.duration)}`,
             inline: false
         });
         embed.setThumbnail(currentSong.thumbnail);

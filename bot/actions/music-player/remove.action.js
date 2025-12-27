@@ -38,12 +38,13 @@ export const removeAction = async (ctx, { position }) => {
         const removed = player.removeTrack(index);
 
         if (removed) {
+            const artist = removed.artist || (typeof removed.artists === 'string' ? removed.artists : 'Unknown');
             const embed = new iEmbedBuilder(ctx)
                 .setColor('#00ff00')
                 .setTitle(`${E.success} Đã xóa`)
                 .setDescription(`Đã xóa: **${removed.title}**`)
                 .addFields(
-                    { name: 'Nghệ sĩ', value: removed.artist || 'Unknown', inline: true },
+                    { name: 'Nghệ sĩ', value: artist, inline: true },
                     { name: 'Thời lượng', value: player.formatDuration(removed.duration), inline: true }
                 );
 

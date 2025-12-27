@@ -243,7 +243,8 @@ class MusicPlayer {
                 }
             }
 
-            console.log(`🎵 Playing: ${track.title} - ${track.artist}`);
+            const artist = track ? (track.artist || (typeof track.artists === 'string' ? track.artists : 'Unknown')) : 'Unknown';
+            console.log(`🎵 Playing: ${track.title} - ${artist}`);
 
             // Lấy stream từ RiknClient
             const stream = await this.riknClient.streamSongByUrl(track.url);
@@ -341,12 +342,13 @@ class MusicPlayer {
 
             // Send notification about next track
             if (nextTrack && this.textChannel) {
+                const artist = nextTrack ? (nextTrack.artist || (typeof nextTrack.artists === 'string' ? nextTrack.artists : 'Unknown')) : 'Unknown';
                 const embed = new EmbedBuilder()
                     .setColor('#0099ff')
                     .setTitle('⏭ Đang phát tiếp')
                     .setDescription(`**[${nextTrack.title}](${nextTrack.url})**`)
                     .addFields(
-                        { name: 'Nghệ sĩ', value: nextTrack.artist || 'Unknown', inline: true },
+                        { name: 'Nghệ sĩ', value: artist, inline: true },
                         { name: 'Thời lượng', value: this.formatDuration(nextTrack.duration), inline: true },
                         { name: 'Còn lại', value: `${this.queue.length - 1} bài`, inline: true }
                     )

@@ -88,7 +88,7 @@ export class ContextAdapter {
         if (this.isInteraction && !this.source.deferred && !this.source.replied) {
             return await this.source.deferReply({ ephemeral });
         }
-        return await this.source.reply({ content: '...', ephemeral });
+        return await this.source.reply({ content: 'ㅤ', ephemeral });
     }
 
     /**
@@ -104,13 +104,9 @@ export class ContextAdapter {
                 msg.author.id === this.source.client.user.id &&
                 msg.reference?.messageId === this.source.id
             );
-
             if (botReply) {
                 return await botReply.edit(content);
-                // send to this channel, no reply
-                // return await this.source.channel.send(content);
             }
-            // If no reply found, send new message
             return await this.source.channel.send(content);
         } catch (error) {
             console.error('Failed to edit message reply:', error);

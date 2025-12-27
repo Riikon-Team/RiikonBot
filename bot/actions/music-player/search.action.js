@@ -54,12 +54,15 @@ export const searchAction = async (ctx, { query }) => {
             return ctx.reply({ embeds: [embed] });
         }
 
-        const options = results.slice(0, 20).map((track, index) => ({
-            label: track.title.substring(0, 100),
-            description: `${track.artist.substring(0, 50)} • ${player.formatDuration(track.duration)}`.substring(0, 100),
-            value: index.toString(),
-            emoji: player.getPlatformEmoji(track.platform)
-        }));
+        const options = results.slice(0, 20).map((track, index) => {
+            const artist = track.artist || (typeof track.artists === 'string' ? track.artists : 'Unknown');
+            return {
+                label: track.title.substring(0, 100),
+                description: `${artist.substring(0, 50)} • ${player.formatDuration(track.duration)}`.substring(0, 100),
+                value: index.toString(),
+                emoji: player.getPlatformEmoji(track.platform)
+            };
+        });
 
         const selectMenu = new StringSelectMenuBuilder()
             .setCustomId(`music_search_${ctx.id}`)
@@ -72,8 +75,9 @@ export const searchAction = async (ctx, { query }) => {
 
         let description = '';
         results.slice(0, 10).forEach((track, index) => {
+            const artist = track.artist || (typeof track.artists === 'string' ? track.artists : 'Unknown');
             description += `**${index + 1}.** ${track.title}\n`;
-            description += `   ${player.getPlatformEmoji(track.platform)} ${track.artist} • ${player.formatDuration(track.duration)}\n\n`;
+            description += `   ${player.getPlatformEmoji(track.platform)} ${artist} • ${player.formatDuration(track.duration)}\n\n`;
         });
 
         const resultEmbed = new iEmbedBuilder(ctx)

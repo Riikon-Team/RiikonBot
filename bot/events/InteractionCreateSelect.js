@@ -63,13 +63,14 @@ async function handleMusicSearchSelect(interaction) {
 
         if (!wasPlaying) {
             const track = await player.play();
+            const artist = track.artist || (typeof track.artists === 'string' ? track.artists : 'Unknown');
             
             const playEmbed = new EmbedBuilder()
                 .setColor('#00ff00')
                 .setTitle('🎵 Bắt đầu phát')
                 .setDescription(`**[${track.title}](${track.url})**`)
                 .addFields(
-                    { name: 'Nghệ sĩ', value: track.artist || 'Unknown', inline: true },
+                    { name: 'Nghệ sĩ', value: artist, inline: true },
                     { name: 'Thời lượng', value: player.formatDuration(track.duration), inline: true },
                     { name: 'Nền tảng', value: `${E[track.platform.toLowerCase()]}`, inline: true }
                 )
@@ -78,12 +79,13 @@ async function handleMusicSearchSelect(interaction) {
 
             await interaction.editReply({ embeds: [playEmbed] });
         } else {
+            const artist = selectedTrack.artist || (typeof selectedTrack.artists === 'string' ? selectedTrack.artists : 'Unknown');
             const addedEmbed = new EmbedBuilder()
                 .setColor('#00ff00')
                 .setTitle(`${E.success} Đã thêm vào hàng đợi`)
                 .setDescription(`**[${selectedTrack.title}](${selectedTrack.url})**`)
                 .addFields(
-                    { name: 'Nghệ sĩ', value: selectedTrack.artist || 'Unknown', inline: true },
+                    { name: 'Nghệ sĩ', value: artist, inline: true },
                     { name: 'Thời lượng', value: player.formatDuration(selectedTrack.duration), inline: true },
                     { name: 'Vị trí', value: `${player.queue.length}`, inline: true }
                 )

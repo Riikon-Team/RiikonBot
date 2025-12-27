@@ -13,6 +13,7 @@ import sysFunc from '../../functions/system.js';
 import gameTopicFunc from '../../functions/game-topics.js';
 import chatFunc from '../../functions/chat.js';
 import musicFunc from '../../functions/music.js';
+import { ContextAdapter } from '../../contexts/ContextAdapter.js';
 import { smartSplitMessage } from '../../utils/splitChat.js';
 import { downloadImageAsBase64 } from '../../utils/downloadImage.js';
 import { SYSTEM_INSTRUCTIONS } from '../../constants/ai.js';
@@ -155,13 +156,30 @@ Note:
 const callFunctions = async (client, functions, interaction = null) => {
   const results = {};
 
+  // Ensure actions receive a ContextAdapter-like `ctx` so they can call `editReply`, etc.
+  let ctx = interaction;
+  try {
+    if (interaction && typeof interaction.editReply !== 'function') {
+      ctx = new ContextAdapter(interaction);
+      try {
+        if (ctx.isMessage) {
+          await ctx.defer();
+        }
+      } catch (err) {
+        console.warn('Failed to defer reply for message context:', err);
+      }
+    }
+  } catch (err) {
+    ctx = interaction;
+  }
+
   for (const func of functions) {
     const functionName = func.name;
     const params = func.parameters || {};
 
     if (funcs[functionName]) {
       try {
-        const result = await funcs[functionName].execute(client, interaction, ...Object.values(params));
+        const result = await funcs[functionName].execute(client, ctx, ...Object.values(params));
         results[functionName] = result;
       } catch (error) {
         console.error(`Error executing function ${functionName}:`, error);
